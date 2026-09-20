@@ -16,8 +16,10 @@ Proyecto académico de la materia de Circuitos.
 | :--- | :--- |
 | Análisis del circuito original | Hecho |
 | Revisión técnica del diseño | Hecho — ver [revisión](docs/revision-tecnica.md) |
+| Topología definida (motor con DC propia) | Hecho — ver [guía de armado](docs/guia-de-armado.md) |
 | Firmware de control | Primera versión, sin probar en hardware |
-| Correcciones de cableado (A1–A4) | Pendientes |
+| Medición de resistencias | Pendiente — bloquea el cableado AC |
+| Armado | Pendiente |
 | Sintonización PID | Pendiente |
 
 ---
@@ -30,9 +32,14 @@ docs/
                                           análisis del circuito, cableado, mecánica.
   revision-tecnica.md                     Auditoría de esa especificación:
                                           4 fallos bloqueantes + 7 bugs del código.
+  guia-de-armado.md                       Topología vigente (motor con fuente DC
+                                          propia), cálculos y orden de armado.
 firmware/
   popcorn_oven/popcorn_oven.ino           Firmware de control (Arduino IDE).
 ```
+
+El esquema de cableado vigente es el de [`guia-de-armado.md`](docs/guia-de-armado.md).
+El de la documentación inicial quedó superado.
 
 ---
 
@@ -41,9 +48,10 @@ firmware/
 Hay **cuatro** correcciones bloqueantes respecto al documento inicial. Están detalladas
 en [`docs/revision-tecnica.md`](docs/revision-tecnica.md):
 
-1. **A1** — El fusible térmico de 15 A va en el tronco común, no después del SSR.
-2. **A2** — Verificar con multímetro si las dos resistencias son independientes o si son
-   una sola bobina derivada. Si son derivadas, el ventilador se para al regular.
+1. **A1** — El fusible térmico de 15 A va en serie con el ramal de calor; el ramal DC
+   lleva su propio fusible de 1 A.
+2. **A2** — *Resuelto* por la topología nueva: el motor ya no depende de las
+   resistencias. En su lugar hay que medirlas y comprobar que `R_paralelo ≥ 12 Ω`.
 3. **A3** — El MAX6675 se alimenta a **3,3 V**. A 5 V daña el GPIO19 del ESP32.
 4. **A4** — Pulldown de 10 kΩ entre GPIO23 y GND, o el SSR puede dispararse durante el
    boot del ESP32.
@@ -75,14 +83,23 @@ El checklist completo de primer encendido está al final de la revisión técnic
 
 ### Potencia (AC)
 
+El motor sale por completo del circuito AC: se eliminan la resistencia-divisor y el
+puente de diodos de su camino y se alimenta con fuente DC propia. Las dos resistencias
+quedan en paralelo y el SSR conmuta el tronco común.
+
 ```
-[Fase] → [Interruptor] → [Fusible térmico 15 A] → [Bimetálico] → ┬─→ [R pequeña] → [Puente diodos] → [Motor] → [Neutro]
-                                                                 └─→ [R grande] → [SSR 1|2] → [Neutro]
+[Fase] → [Interruptor] → ┬─→ [Fusible 1 A] → [Fuente 12 V] ─┬─→ [Motor ventilador]
+                         │                                   └─→ [Buck 5 V] → [ESP32]
+                         │
+                         └─→ [Fusible térmico 15 A] → [Bimetálico] → [SSR 1|2] → [R grande ∥ R pequeña] → [Neutro]
 ```
 
-El ramal del motor queda permanentemente alimentado mientras el interruptor esté
-cerrado, de modo que el ventilador no se detiene cuando el PID recorta la resistencia.
-**Esto depende de que se cumpla A2.**
+El ramal DC se toma antes del fusible térmico y del bimetálico, así que el ventilador
+sigue soplando —y enfriando el cilindro— aunque cualquiera de los dos corte.
+
+> **Antes de cablear:** medí ambas resistencias y verificá que
+> `R_paralelo = (R1·R2)/(R1+R2) ≥ 12 Ω`. Por debajo de eso el SSR ve más de 10 A.
+> El cálculo completo está en la [guía de armado](docs/guia-de-armado.md).
 
 ---
 

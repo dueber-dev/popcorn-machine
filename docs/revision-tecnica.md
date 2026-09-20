@@ -29,9 +29,15 @@ y el nodo donde se bifurcan los dos ramales:
 
 ---
 
-### A2. Hay que verificar si las dos resistencias son realmente independientes — **BLOQUEANTE**
+### A2. Hay que verificar si las dos resistencias son realmente independientes — **RESUELTO**
 
-Este es el error clásico de esta modificación y el documento lo da por resuelto sin
+> **Resuelto** por la topología de [`guia-de-armado.md`](guia-de-armado.md): el motor se
+> alimenta con fuente DC propia y deja de depender de las resistencias, así que el
+> escenario de abajo ya no puede darse. Se conserva el análisis porque la medición de
+> las resistencias sigue siendo necesaria, ahora por otro motivo: confirmar que el
+> paralelo de ambas no excede la corriente del SSR y del fusible.
+
+Este es el error clásico de esta modificación y el documento lo daba por resuelto sin
 comprobarlo.
 
 El diagrama asume dos ramales **en paralelo** desde el mismo nodo. Eso solo es válido
@@ -86,7 +92,12 @@ desde que arranca el programa; el pulldown cubre el hueco anterior.
 
 ---
 
-### A5. El bimetálico original va a cortar el ventilador junto con la resistencia
+### A5. El bimetálico original va a cortar el ventilador junto con la resistencia — **RESUELTO PARCIALMENTE**
+
+> La topología de [`guia-de-armado.md`](guia-de-armado.md) saca el ventilador del tronco
+> común, así que el bimetálico ya no lo corta. Lo que sigue vigente es lo otro: el
+> bimetálico probablemente abre cerca del setpoint de trabajo, y hay que medir a qué
+> temperatura lo hace para elegir el setpoint máximo útil.
 
 El documento conserva el bimetálico en el tronco común (bien, es un backstop
 independiente), pero no menciona la consecuencia: el bimetálico de una palomitera
