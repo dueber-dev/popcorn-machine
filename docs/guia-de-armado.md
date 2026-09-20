@@ -110,6 +110,49 @@ Dejarla afuera no es ninguna pérdida: son unos 24 W sobre ~1000 W.
   abierto.
 - El SSR no lleva el ramal DC: solo conmuta las resistencias.
 
+---
+
+## Alimentación: todo de una sola clavija, sin baterías
+
+La "fuente DC propia" del motor **no es una batería ni una fuente externa**. Es un módulo
+AC-DC que va montado dentro de la máquina y se alimenta del mismo cable de red. El
+aparato terminado tiene **un solo cable a la pared**.
+
+| Qué | Componente | Notas |
+| :--- | :--- | :--- |
+| 12 V para el motor | Módulo AC-DC aislado de 12 V, ≥ 1 A (HLK-10M12, o cualquier fuente open-frame de 12 V / 2 A) | Dimensionar al doble de la corriente medida en la Etapa 2. Si el motor resulta ser de 24 V, fuente de 24 V |
+| 5 V para el ESP32 | Convertidor buck MP1584 o LM2596 colgado de los 12 V | Entra al pin `5V`/`VIN`, no al `3V3` |
+| 3,3 V para el MAX6675 | Regulador de la propia placa ESP32 | Pin `3V3` (ver A3) |
+| Protección | Fusible de 1 A en el ramal DC | El de 15 A nunca protegería un consumo de < 1 A |
+
+### Por qué la conmutación del SSR no afecta a la electrónica
+
+El ramal DC cuelga de la red **en paralelo** con el ramal de calor, no en serie. El
+módulo AC-DC trabaja en un rango de entrada de 85–265 V y tiene regulación propia, así
+que la conmutación de ~8 A del SSR no se refleja en sus 12 V de salida. El motor ve
+tensión fija todo el tiempo, independientemente de lo que haga el PID.
+
+Este desacople es justamente lo que se ganó al sacar el motor del divisor de tensión. En
+el diseño original los dos ramales estaban acoplados, y ese era el problema A2.
+
+### La resistencia nunca ve tensión variable
+
+No hace falta regular la tensión de la resistencia para regular la temperatura. La
+resistencia solo ve **120 V o 0 V**. Lo que el PID controla es la fracción de tiempo
+encendida dentro de la ventana de 2 s: 70 % de potencia = 1,4 s conduciendo, 0,6 s
+apagado. Para una masa térmica con constante de tiempo de minutos, eso equivale a
+aplicarle el 70 % de la potencia de forma continua.
+
+Variar la tensión de verdad exigiría control por ángulo de fase con TRIAC y detección de
+cruce por cero — más componentes, mucho más ruido eléctrico, y ningún beneficio para una
+carga térmica. Además, el SSR-25DA es de disparo en cruce por cero y físicamente no
+puede hacer control de fase.
+
+> **Al flashear:** no alimentés el ESP32 por USB y por el buck al mismo tiempo. Desconectá
+> el ramal DC (o la máquina de la pared) antes de conectar el USB.
+
+---
+
 ### Control (sin cambios respecto al README)
 
 | MAX6675 (HW-550) | ESP32 |
