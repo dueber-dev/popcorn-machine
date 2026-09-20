@@ -32,13 +32,16 @@ docs/
                                           análisis del circuito, cableado, mecánica.
   revision-tecnica.md                     Auditoría de esa especificación:
                                           4 fallos bloqueantes + 7 bugs del código.
+  esquema-de-conexiones.md                Lista de materiales, tabla de conexiones
+                                          terminal por terminal y verificaciones.
+  esquema.svg                             Diagrama para imprimir.
   guia-de-armado.md                       Topología vigente (motor con fuente DC
                                           propia), cálculos y orden de armado.
 firmware/
   popcorn_oven/popcorn_oven.ino           Firmware de control (Arduino IDE).
 ```
 
-El esquema de cableado vigente es el de [`guia-de-armado.md`](docs/guia-de-armado.md).
+El esquema de cableado vigente es el de [`esquema-de-conexiones.md`](docs/esquema-de-conexiones.md).
 El de la documentación inicial quedó superado.
 
 ---

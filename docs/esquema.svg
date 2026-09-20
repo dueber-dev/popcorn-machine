@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 970" width="1280" height="970" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <style>
+    .bg   { fill: #ffffff; }
+    .panelAC { fill: #fdf3f0; stroke: #b03a2e; stroke-width: 2; }
+    .panelDC { fill: #eef5fc; stroke: #1f618d; stroke-width: 2; }
+    .ttlAC { fill: #b03a2e; font-size: 17px; font-weight: 700; letter-spacing: .5px; }
+    .ttlDC { fill: #1f618d; font-size: 17px; font-weight: 700; letter-spacing: .5px; }
+    .box  { fill: #ffffff; stroke: #2c3e50; stroke-width: 1.6; }
+    .boxk { fill: #fdecea; stroke: #b03a2e; stroke-width: 1.8; }
+    .wAC  { stroke: #b03a2e; stroke-width: 2.6; fill: none; stroke-linecap: round; }
+    .wDC  { stroke: #1f618d; stroke-width: 2.2; fill: none; stroke-linecap: round; }
+    .wPE  { stroke: #7d6608; stroke-width: 2.2; fill: none; stroke-dasharray: 6 4; }
+    .lblb { fill: #1a1a1a; font-size: 14px; font-weight: 600; }
+    .sml  { fill: #5d6d7e; font-size: 11.5px; }
+    .pin  { fill: #1f618d; font-size: 11.5px; font-weight: 600; }
+    .pinR { fill: #b03a2e; font-size: 11.5px; font-weight: 600; }
+    .node { fill: #b03a2e; }
+    .nodeD{ fill: #1f618d; }
+    .flag { fill: #d6eaf8; stroke: #1f618d; stroke-width: 1.5; }
+    .note { fill: #5d6d7e; font-size: 12px; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1280" height="970"/>
+
+  <!-- ==================== PANEL AC ==================== -->
+  <rect class="panelAC" x="20" y="36" width="1240" height="436" rx="8"/>
+  <text class="ttlAC" x="40" y="64">POTENCIA — 120 V / 60 Hz</text>
+  <text class="note" x="330" y="64">El SSR corta la FASE. R1 y R2 en paralelo, aguas abajo del SSR.</text>
+
+  <!-- Toma -->
+  <rect class="box" x="45" y="92" width="112" height="60" rx="4"/>
+  <text class="lblb" x="101" y="115" text-anchor="middle">TOMA AC</text>
+  <text class="sml"  x="101" y="133" text-anchor="middle">120 V · 60 Hz</text>
+  <text class="pinR" x="163" y="102">L</text>
+  <text class="pinR" x="163" y="170">N</text>
+  <text class="sml"  x="62"  y="196">PE</text>
+
+  <!-- L, interruptor, riel fase -->
+  <path class="wAC" d="M157 108 H205"/>
+  <rect class="box" x="205" y="86" width="132" height="44" rx="4"/>
+  <text class="lblb" x="271" y="107" text-anchor="middle">SW1</text>
+  <text class="sml"  x="271" y="123" text-anchor="middle">interruptor general</text>
+  <path class="wAC" d="M337 108 H372 V332"/>
+  <text class="sml" x="380" y="350">riel FASE</text>
+
+  <!-- N y riel neutro -->
+  <path class="wAC" d="M157 140 V448 H1196 V150"/>
+  <text class="sml" x="700" y="466" text-anchor="middle">riel NEUTRO</text>
+
+  <!-- PE -->
+  <path class="wPE" d="M90 152 V404"/>
+  <path class="wPE" d="M74 404 H106 M79 412 H101 M85 420 H95"/>
+  <text class="sml" x="44" y="438">chasis</text>
+
+  <!-- Rung 1: ramal DC -->
+  <circle class="node" cx="372" cy="150" r="5"/>
+  <text class="sml" x="352" y="146" text-anchor="end">N1</text>
+  <path class="wAC" d="M372 150 H408"/>
+  <rect class="box" x="408" y="128" width="130" height="44" rx="4"/>
+  <text class="lblb" x="473" y="149" text-anchor="middle">F1 · 1 A</text>
+  <text class="sml"  x="473" y="164" text-anchor="middle">fusible ramal DC</text>
+  <path class="wAC" d="M538 150 H602"/>
+
+  <rect class="box" x="602" y="116" width="238" height="70" rx="4"/>
+  <text class="lblb" x="721" y="140" text-anchor="middle">PS1 · Fuente AC-DC 12 V</text>
+  <text class="sml"  x="721" y="158" text-anchor="middle">aislada, ≥ 1 A — dentro de la máquina</text>
+  <text class="pinR" x="610" y="180">L</text>
+  <text class="pinR" x="826" y="180">N</text>
+  <path class="wAC" d="M840 150 H1196"/>
+
+  <!-- salidas DC de PS1 -->
+  <path class="wDC" d="M660 186 V212"/>
+  <path class="wDC" d="M782 186 V212"/>
+  <path class="flag" d="M614 212 h92 l14 15 l-14 15 h-92 z"/>
+  <text class="pin" x="656" y="232" text-anchor="middle">+12 V</text>
+  <path class="flag" d="M736 212 h92 l14 15 l-14 15 h-92 z"/>
+  <text class="pin" x="778" y="232" text-anchor="middle">GND</text>
+  <text class="note" x="721" y="262" text-anchor="middle">▼ continúa en el panel de control</text>
+
+  <!-- Rung 2: ramal de calor -->
+  <circle class="node" cx="372" cy="306" r="5"/>
+  <path class="wAC" d="M372 306 H404"/>
+
+  <rect class="boxk" x="404" y="284" width="152" height="44" rx="4"/>
+  <text class="lblb" x="480" y="305" text-anchor="middle">FT1 · 15 A</text>
+  <text class="sml"  x="480" y="320" text-anchor="middle">fusible térmico</text>
+  <path class="wAC" d="M556 306 H586"/>
+
+  <rect class="boxk" x="586" y="284" width="152" height="44" rx="4"/>
+  <text class="lblb" x="662" y="305" text-anchor="middle">BM1</text>
+  <text class="sml"  x="662" y="320" text-anchor="middle">bimetálico</text>
+  <path class="wAC" d="M738 306 H768"/>
+
+  <rect class="box" x="768" y="278" width="156" height="56" rx="4"/>
+  <text class="lblb" x="846" y="300" text-anchor="middle">SSR1 · SSR-25 DA</text>
+  <text class="sml"  x="846" y="318" text-anchor="middle">terminales 1 y 2 (carga)</text>
+  <text class="pinR" x="772" y="352">1</text>
+  <text class="pinR" x="914" y="352">2</text>
+  <path class="wAC" d="M924 306 H956"/>
+
+  <circle class="node" cx="956" cy="306" r="5"/>
+  <text class="sml" x="956" y="286" text-anchor="middle">N2</text>
+  <rect class="boxk" x="982" y="284" width="150" height="44" rx="4"/>
+  <text class="lblb" x="1057" y="305" text-anchor="middle">R1</text>
+  <text class="sml"  x="1057" y="320" text-anchor="middle">resistencia grande</text>
+  <path class="wAC" d="M956 306 H982"/>
+  <path class="wAC" d="M1132 306 H1196"/>
+
+  <!-- Rung 3: R2 -->
+  <path class="wAC" d="M956 306 V392 H982"/>
+  <rect class="boxk" x="982" y="370" width="150" height="44" rx="4"/>
+  <text class="lblb" x="1057" y="391" text-anchor="middle">R2</text>
+  <text class="sml"  x="1057" y="406" text-anchor="middle">resistencia pequeña</text>
+  <path class="wAC" d="M1132 392 H1196"/>
+  <text class="note" x="1057" y="434" text-anchor="middle">solo si R_paralelo ≥ 12 Ω</text>
+
+  <!-- ==================== PANEL DC ==================== -->
+  <rect class="panelDC" x="20" y="500" width="1240" height="450" rx="8"/>
+  <text class="ttlDC" x="40" y="528">CONTROL — 12 V / 5 V / 3,3 V DC</text>
+  <text class="note" x="370" y="528">Todo sale de PS1. Sin baterías: una sola clavija a la pared.</text>
+  <circle class="node" cx="1042" cy="524" r="5"/>
+  <text class="note" x="1056" y="529">punto = unión eléctrica</text>
+
+  <!-- conectores de entrada -->
+  <path class="flag" d="M46 556 h92 l14 15 l-14 15 h-92 z"/>
+  <text class="pin" x="88" y="576" text-anchor="middle">+12 V</text>
+  <path class="flag" d="M46 890 h92 l14 15 l-14 15 h-92 z"/>
+  <text class="pin" x="88" y="910" text-anchor="middle">GND</text>
+
+  <!-- rieles -->
+  <path class="wDC" d="M152 571 H560"/>
+  <text class="sml" x="300" y="562">riel +12 V</text>
+  <path class="wDC" d="M152 905 H1000"/>
+  <text class="sml" x="300" y="926">riel GND común</text>
+
+  <!-- Motor -->
+  <rect class="box" x="186" y="606" width="150" height="62" rx="4"/>
+  <text class="lblb" x="261" y="632" text-anchor="middle">M1 · Motor</text>
+  <text class="sml"  x="261" y="650" text-anchor="middle">ventilador, siempre ON</text>
+  <path class="wDC" d="M226 606 V571"/>
+  <path class="wDC" d="M296 668 V905"/>
+  <text class="pin" x="210" y="598">+</text>
+  <text class="pin" x="304" y="688">−</text>
+
+  <!-- Buck -->
+  <rect class="box" x="396" y="600" width="164" height="74" rx="4"/>
+  <text class="lblb" x="478" y="624" text-anchor="middle">PS2 · Buck 12 → 5 V</text>
+  <text class="sml"  x="478" y="642" text-anchor="middle">MP1584 o LM2596</text>
+  <text class="sml"  x="478" y="660" text-anchor="middle">ajustar a 5,0 V antes</text>
+  <path class="wDC" d="M426 600 V571"/>
+  <path class="wDC" d="M466 674 V905"/>
+  <path class="wDC" d="M560 637 H632"/>
+
+  <!-- ESP32 -->
+  <rect class="box" x="632" y="580" width="180" height="280" rx="4"/>
+  <text class="lblb" x="722" y="604" text-anchor="middle">U1 · ESP32</text>
+  <text class="sml"  x="722" y="621" text-anchor="middle">DevKit v1</text>
+  <text class="pin"  x="640" y="632">VIN</text>
+  <text class="pin"  x="806" y="660" text-anchor="end">3V3</text>
+  <text class="pin"  x="806" y="684" text-anchor="end">GND</text>
+  <text class="pin"  x="806" y="708" text-anchor="end">GPIO18</text>
+  <text class="pin"  x="806" y="732" text-anchor="end">GPIO5</text>
+  <text class="pin"  x="806" y="756" text-anchor="end">GPIO19</text>
+  <text class="pin"  x="806" y="800" text-anchor="end">GND</text>
+  <text class="pin"  x="806" y="836" text-anchor="end">GPIO23</text>
+  <text class="pin"  x="640" y="852">GND</text>
+  <path class="wDC" d="M690 860 V905"/>
+
+  <!-- MAX6675 -->
+  <text class="lblb" x="974" y="616" text-anchor="middle">U2 · MAX6675 (HW-550)</text>
+  <text class="sml"  x="974" y="632" text-anchor="middle">fuera de la zona caliente</text>
+  <rect class="box" x="892" y="640" width="164" height="130" rx="4"/>
+  <path class="wDC" d="M812 664 H892"/>
+  <path class="wDC" d="M812 688 H892"/>
+  <path class="wDC" d="M812 712 H892"/>
+  <path class="wDC" d="M812 736 H892"/>
+  <path class="wDC" d="M812 760 H892"/>
+  <text class="pin" x="900" y="660">VCC  (3,3 V)</text>
+  <text class="pin" x="900" y="684">GND</text>
+  <text class="pin" x="900" y="708">SCK</text>
+  <text class="pin" x="900" y="732">CS</text>
+  <text class="pin" x="900" y="756">SO</text>
+
+  <!-- Termopar -->
+  <path class="wDC" d="M1056 700 H1108"/>
+  <path class="wDC" d="M1056 724 H1108"/>
+  <text class="pin" x="1082" y="694" text-anchor="middle">T+</text>
+  <text class="pin" x="1082" y="742" text-anchor="middle">T−</text>
+  <rect class="box" x="1108" y="664" width="126" height="92" rx="4"/>
+  <text class="lblb" x="1171" y="692" text-anchor="middle">TC1</text>
+  <text class="sml"  x="1171" y="712" text-anchor="middle">termopar tipo K</text>
+  <text class="sml"  x="1171" y="730" text-anchor="middle">junta aislada</text>
+  <text class="note" x="1171" y="782" text-anchor="middle">amarillo → T+</text>
+  <text class="note" x="1171" y="800" text-anchor="middle">rojo → T−</text>
+
+  <!-- SSR control -->
+  <path class="wDC" d="M812 804 H892"/>
+  <path class="wDC" d="M812 840 H892"/>
+  <text class="pin" x="852" y="798" text-anchor="middle">4 (−)</text>
+  <text class="pin" x="868" y="832" text-anchor="middle">3 (+)</text>
+  <rect class="box" x="892" y="790" width="164" height="80" rx="4"/>
+  <text class="lblb" x="974" y="818" text-anchor="middle">SSR1 · control</text>
+  <text class="sml"  x="974" y="838" text-anchor="middle">terminales 3 y 4</text>
+  <text class="sml"  x="974" y="856" text-anchor="middle">mismo SSR de arriba</text>
+
+  <!-- pulldown R3 -->
+  <circle class="nodeD" cx="840" cy="840" r="4.5"/>
+  <path class="wDC" d="M840 840 V862"/>
+  <rect class="box" x="830" y="862" width="20" height="30" rx="2"/>
+  <path class="wDC" d="M840 892 V905"/>
+  <text class="note" x="840" y="938" text-anchor="middle">R3 · 10 kΩ pulldown</text>
+</svg>
