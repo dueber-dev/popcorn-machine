@@ -48,6 +48,15 @@ cableado que unía R2 con esa placa. Ya no cumplen función.
 | PS1 | Fuente AC-DC aislada | 12 V, ≥ 1 A (HLK-10M12 o open-frame 12 V / 2 A) | 1 |
 | PS2 | Convertidor buck | MP1584EN o LM2596 ajustable, salida fijada a 5,0 V | 1 |
 | F1 | Portafusible + fusible | Vidrio 5 × 20 mm, 1 A / 250 V, para el ramal DC | 1 |
+| C1 | Condensador cerámico 100 nF | 50 V, directo en las terminales del motor | 1 |
+| C2 | Condensador electrolítico 470–1000 µF | 25 V, en el riel de +12 V | 1 |
+
+**C1 y C2 son supresión de ruido, no filtrado de alimentación.** PS1 y el buck ya
+entregan DC limpia por su cuenta. Lo que hay que apagar es el chisporroteo de las
+escobillas del motor: el MAX6675 amplifica **41 µV por grado**, y ese ruido, acoplado por
+el cableado, se ve como saltos en la lectura de temperatura. C1 va soldado lo más cerca
+posible de las terminales del motor; C2 en el riel, cerca del buck. Respetá la polaridad
+de C2.
 
 La corriente de PS1 se define en la Etapa 2, cuando midas el consumo real del motor.
 Comprá al doble de esa corriente. Si el motor resulta ser de 24 V, PS1 de 24 V y el buck
@@ -165,6 +174,10 @@ Ver [`esquema.svg`](esquema.svg) para la versión gráfica. En texto:
 | 21 | Riel GND | PS2 buck, **IN−** |
 | 22 | PS2 **OUT+** *(ajustado a 5,0 V antes de conectar)* | U1 ESP32, pin **`VIN`** / **`5V`** |
 | 23 | PS2 **OUT−** | U1 ESP32, pin **`GND`** |
+| 23a | C1 (100 nF), una pata | M1 motor, terminal **+**, soldado en la terminal misma |
+| 23b | C1, otra pata | M1 motor, terminal **−** |
+| 23c | C2 (470–1000 µF), pata **+** | Riel +12 V, cerca del buck |
+| 23d | C2, pata **−** | Riel GND |
 
 > Ajustá el buck a 5,0 V con el multímetro **antes** de conectarlo al ESP32. Sale de
 > fábrica en cualquier valor.
@@ -239,3 +252,50 @@ Con la clavija **fuera** de la pared, multímetro en continuidad:
 
 Recién con V1 a V8 en verde pasás a la Etapa 4 de la
 [guía de armado](guia-de-armado.md).
+
+---
+
+## 7. Por qué se descarta el puente rectificador original
+
+La placa del motor trae cuatro diodos y **ningún condensador**. Es normal y está bien
+para lo que hacía, pero hay dos razones independientes para no reutilizarla, y la
+segunda es la importante.
+
+### 7.1 Sin condensador, la salida es DC pulsante
+
+Un puente de onda completa sin filtro entrega el valor absoluto de la senoidal: una
+señal que **cae a cero 120 veces por segundo**.
+
+A un motor de escobillas eso no le importa. Su inductancia y su inercia mecánica hacen
+de filtro: la corriente no alcanza a caer a cero entre pulsos y el rotor ni se entera.
+Por eso el fabricante se ahorró el condensador — no le hacía falta.
+
+A un microcontrolador sí le importaría. El ESP32 necesita un riel estable; alimentado
+con eso se reiniciaría 120 veces por segundo. Para usarlo habría que agregar
+condensador de filtro y regulador.
+
+### 7.2 No está aislado de la red — y esta es la razón de fondo
+
+Las entradas AC del puente vienen una de la fase (a través de la resistencia-divisor) y
+otra del neutro. Eso significa que el **negativo de ese puente está conectado a la red a
+través de un diodo**, no aislado.
+
+Si alimentaras el ESP32 desde ahí, el GND de tu microcontrolador quedaría a potencial de
+red. Con dos consecuencias:
+
+- El conector USB, la laptop conectada a él y el termopar (cuyo `T−` está referenciado al
+  GND del MAX6675) quedarían todos a potencial de red.
+- Tocar cualquier pin del ESP32 sería tocar los 120 V.
+
+Ningún condensador arregla eso. Por eso el proyecto usa **PS1**, una fuente conmutada
+**aislada**: tiene un transformador adentro que separa galvánicamente el lado de red del
+lado de 12 V. Esa barrera, sumada al optoacoplador interno del SSR, es lo que mantiene
+toda la electrónica de control fuera del alcance de la red.
+
+### 7.3 Lo que sí hace falta comprar por el motor
+
+Nada relacionado con el puente, pero sí **C1 y C2** (§1.3). El motor de escobillas es una
+fuente de ruido eléctrico a centímetros de un amplificador que mide **41 µV por grado**.
+Sin C1 en las terminales del motor, es probable que veas saltos erráticos en la lectura
+de temperatura. Con el diseño original ese ruido no molestaba a nadie porque no había
+nada midiendo microvoltios cerca.
