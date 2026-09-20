@@ -1,0 +1,24 @@
+# Arduino / PlatformIO
+build/
+.pio/
+.pioenvs/
+.piolibdeps/
+*.elf
+*.bin
+*.hex
+*.map
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# SO
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Credenciales (WiFi, MQTT, etc. cuando se agreguen)
+secrets.h
+credentials.h
+.env
