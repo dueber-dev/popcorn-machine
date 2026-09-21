@@ -18,6 +18,7 @@ Proyecto académico de la materia de Circuitos.
 | Revisión técnica del diseño | Hecho — ver [revisión](docs/revision-tecnica.md) |
 | Topología definida (motor con DC propia) | Hecho — ver [guía de armado](docs/guia-de-armado.md) |
 | Firmware de control | Primera versión, sin probar en hardware |
+| Prueba de banco del relé | Sketch listo — ver [`prueba_ssr`](firmware/prueba_ssr/prueba_ssr.ino) |
 | Medición de resistencias | Pendiente — bloquea el cableado AC |
 | Armado | Pendiente |
 | Sintonización PID | Pendiente |
@@ -39,6 +40,8 @@ docs/
                                           propia), cálculos y orden de armado.
 firmware/
   popcorn_oven/popcorn_oven.ino           Firmware de control (Arduino IDE).
+  prueba_ssr/prueba_ssr.ino               Prueba de banco del relé, sin termopar
+                                          ni conexión a la red.
 ```
 
 El esquema de cableado vigente es el de [`esquema-de-conexiones.md`](docs/esquema-de-conexiones.md).
@@ -48,16 +51,16 @@ El de la documentación inicial quedó superado.
 
 ## Antes de conectar nada a la red
 
-Hay **cuatro** correcciones bloqueantes respecto al documento inicial. Están detalladas
-en [`docs/revision-tecnica.md`](docs/revision-tecnica.md):
+Correcciones respecto al documento inicial. Están detalladas en
+[`docs/revision-tecnica.md`](docs/revision-tecnica.md):
 
 1. **A1** — El fusible térmico de 15 A va en serie con el ramal de calor; el ramal DC
    lleva su propio fusible de 1 A.
 2. **A2** — *Resuelto* por la topología nueva: el motor ya no depende de las
    resistencias. En su lugar hay que medirlas y comprobar que su paralelo da 12 Ω o más.
 3. **A3** — El MAX6675 se alimenta a **3,3 V**. A 5 V daña el GPIO19 del ESP32.
-4. **A4** — Pulldown de 10 kΩ entre GPIO23 y GND, o el SSR puede dispararse durante el
-   boot del ESP32.
+4. **A4** *(recomendado, no bloqueante)* — Pulldown de 10 kΩ entre GPIO23 y GND. Deja
+   el pin en estado definido durante el boot; ver el análisis en la revisión.
 
 El checklist completo de primer encendido está al final de la revisión técnica.
 

@@ -2,7 +2,8 @@
 
 Auditoría de [`documentacion_inicial_del_proyecto.md`](documentacion_inicial_del_proyecto.md).
 Ordenada por severidad. Lo marcado como **BLOQUEANTE** hay que resolverlo antes de
-energizar nada con AC.
+energizar nada con AC; lo marcado como **RECOMENDADO** es buena práctica que conviene
+hacer igual.
 
 ---
 
@@ -80,15 +81,38 @@ saca lógica **al nivel de su VCC**. Los GPIO del ESP32 **no son tolerantes a 5 
 
 ---
 
-### A4. Falta el pulldown en la línea de disparo del SSR — **BLOQUEANTE**
+### A4. Falta el pulldown en la línea de disparo del SSR — **RECOMENDADO**
 
-Durante el reset, el boot y el flasheo, el GPIO23 queda en alta impedancia. Una entrada
-flotante en el SSR puede dispararlo, lo que significa **resistencia a plena potencia con
-el ESP32 todavía sin arrancar y sin control ninguno**.
+> **Corrección de calificación.** Esto se marcó primero como bloqueante y no lo es para
+> el montaje concreto de este proyecto. El análisis honesto está abajo.
+
+Durante el reset, el boot y el flasheo, el GPIO23 queda en alta impedancia.
+
+**Por qué con este relé no es crítico:** la entrada del SSR-25 DA es un LED con
+resistencia en serie, con el cátodo al GND del ESP32. Si el GPIO queda en alta
+impedancia, sencillamente **no hay camino de corriente** que encienda ese LED: no hay
+fuente que lo alimente. El GPIO23 tampoco tiene pull-up interno activo al reset, así que
+no se va a ir solo a nivel alto. En la práctica, un pin flotante deja este relé apagado.
+
+**Por qué ponerlo igual:**
+
+- Cuesta centavos y es práctica estándar en cualquier salida que maneje potencia.
+- Deja el pin en un estado **definido** en vez de indeterminado. Un pin flotante es
+  susceptible a ESD y a acoplamiento, y "en la práctica no pasa" no es lo mismo que "no
+  puede pasar".
+- Si algún día cambiás el SSR por uno de esos módulos chinos en placa con transistor de
+  entrada, ahí sí una entrada flotante puede significar **encendido**. El pulldown te
+  cubre ese cambio sin tener que acordarte.
+- Es verificable: con el ESP32 sin alimentar, medís ≈ 10 kΩ entre GPIO23 y GND y sabés
+  que está puesto.
 
 **Corrección:** resistencia de **10 kΩ entre GPIO23 y GND**, física, en la placa. El
 firmware pone el pin en LOW como primera instrucción del `setup()`, pero eso solo cubre
-desde que arranca el programa; el pulldown cubre el hueco anterior.
+desde que arranca el programa.
+
+Para una prueba de banco sin nada conectado a la red, es prescindible. Lo que sí protege
+de verdad contra un disparo no comandado con la resistencia cableada son el bimetálico y
+el fusible térmico, que no dependen de ningún componente de señal.
 
 ---
 
