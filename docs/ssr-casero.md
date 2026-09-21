@@ -1,0 +1,281 @@
+# Relé de estado sólido construido en PCB
+
+Sustituto del SSR-25 DA comercial, para cumplir con el requisito de construir el módulo.
+Reproduce lo mismo que hace el comercial: optoacoplador con detección de cruce por cero
+disparando un triac de potencia.
+
+Diagrama: [`esquema-ssr-casero.svg`](esquema-ssr-casero.svg).
+
+Red asumida: **120 V / 60 Hz**, carga resistiva de ~10 A.
+
+---
+
+## 1. Por qué la protoboard no sirve
+
+Dos razones independientes, y cada una alcanza por sí sola.
+
+### 1.1 La corriente
+
+Los contactos de una protoboard son láminas de bronce fosforado con un área de contacto
+diminuta. El fabricante los especifica típicamente en **1 A**, algunos en 2 A.
+
+Con una resistencia de contacto realista de 30 mΩ y 10 A circulando:
+
+```
+P = I² × R = 10² × 0,03 = 3 W
+```
+
+Tres vatios disipados en un contacto del tamaño de un grano de arroz, encapsulado en ABS
+que reblandece alrededor de los 100 °C. No es que se vaya a calentar: **se derrite**, y
+antes de derretirse aumenta su resistencia, lo que aumenta la disipación, que aumenta la
+temperatura. Es realimentación positiva.
+
+Estás **10 veces por encima** del valor nominal. No es un caso límite.
+
+### 1.2 La tensión
+
+Aunque circularan 100 mA, seguiría sin ir en protoboard. La separación entre filas es de
+2,54 mm, el plástico de las protoboards baratas no tiene clasificación de retardo a la
+llama, y los contactos quedan expuestos al dedo. Son 120 V que pueden matar.
+
+### 1.3 Qué sí va en protoboard
+
+El **lado de control**: el optoacoplador, su resistencia de entrada y los cables al
+ESP32. Todo eso es de baja tensión y corrientes de miliamperios. Podés prototiparlo ahí
+sin problema.
+
+El **lado de potencia** va en PCB, o directamente cableado a los terminales del triac.
+Nunca en protoboard.
+
+---
+
+## 2. Cómo funciona el circuito
+
+El diagrama del SSR comercial que encontraste tiene cuatro bloques. Los reproducimos uno
+por uno:
+
+| Bloque del comercial | Nuestro equivalente |
+| :--- | :--- |
+| `INPUT CIRCUIT` + LED | Resistencia de 330 Ω + el LED interno del optoacoplador |
+| Fototriac + `ZERO CROSS CIRCUIT` | **MOC3063**, que trae el detector de cruce por cero integrado |
+| Triac de potencia | **BTA41-600B** sobre disipador |
+| Red RC en paralelo | Snubber de 100 Ω + 100 nF X2 |
+
+La secuencia: el GPIO23 enciende el LED del optoacoplador. El fototriac que está del otro
+lado conduce, **pero solo cuando la senoidal pasa por cero** — eso lo garantiza el
+circuito de cruce por cero interno del MOC3063. Ese pulso llega a la puerta del triac
+grande, que se engancha y conduce el resto del semiciclo. Al siguiente cruce por cero el
+triac se apaga solo, y si el LED sigue encendido vuelve a dispararse.
+
+**No hay conexión eléctrica entre el ESP32 y los 120 V.** La única unión es óptica: luz
+atravesando el encapsulado del MOC3063. Eso es lo que hace segura toda la arquitectura, y
+es el punto que no se puede comprometer al diseñar la placa.
+
+Como el disparo es en cruce por cero igual que el comercial, **el firmware no cambia
+nada**. La ventana de 2 segundos funciona idéntico.
+
+---
+
+## 3. Lista de materiales
+
+### 3.1 Componentes activos
+
+| Componente | Especificación | Por qué ese |
+| :--- | :--- | :--- |
+| **Optoacoplador MOC3063** | DIP-6, salida fototriac 600 V, con cruce por cero, corriente de disparo 5 mA | Los 5 mA los entrega el GPIO del ESP32 con holgura. El MOC3041 también sirve pero pide 15 mA |
+| **Triac BTA41-600B** | 40 A, 600 V, encapsulado TOP-3 con **tab aislado** | El sufijo **BTA** significa tab aislado de la red (2500 V). El **BTB** no lo está: su tab está unido a MT2, o sea a los 120 V |
+
+> **Comprá BTA, no BTB.** Si conseguís solo BTB, el disipador queda a potencial de red y
+> necesitás aislador de mica más arandela de hombro, y aun así el disipador no se puede
+> tocar. No vale la pena el riesgo.
+
+Alternativas al BTA41 si no lo conseguís: **BTA24-600B** (25 A) o **BTA16-600B** (16 A).
+Los tres aguantan 10 A; el más grande simplemente corre más frío.
+
+### 3.2 Componentes pasivos
+
+| Componente | Valor | Función |
+| :--- | :--- | :--- |
+| Resistencia de entrada | **330 Ω**, 1/4 W | Limita la corriente del LED del optoacoplador a ~6 mA |
+| Resistencia de puerta | **180 Ω**, 1 W | Limita la corriente pico del fototriac. **No bajar de 180 Ω** |
+| Resistencia de puerta a MT1 *(opcional)* | 1 kΩ, 1/4 W | Mejora la inmunidad al ruido, evita disparos falsos |
+| Resistencia del snubber | **100 Ω**, 2 W | Amortigua el dV/dt |
+| Condensador del snubber | **100 nF, clase X2, 275 VAC** | Va conectado a la red: **tiene que ser X2**. Un cerámico común no sirve |
+| Varistor (MOV) | 14 mm, 130–150 VAC de operación (S14K130 o 14D201K) | Absorbe picos de la red |
+
+**El 180 Ω no es un valor arbitrario.** El pico de la senoidal son 170 V, y el MOC3063
+aguanta 1 A de pico: 170 / 180 = 0,94 A, justo por debajo del límite. Si ponés 100 Ω lo
+destruís.
+
+**El condensador X2 tampoco es negociable.** Un capacitor conectado entre línea y neutro
+que falle en cortocircuito provoca un incendio. Los X2 están diseñados para fallar en
+circuito abierto.
+
+### 3.3 Mecánica y conexión
+
+| Componente | Especificación |
+| :--- | :--- |
+| Disipador para el triac | **≥ 3 °C/W**, con aletas, aproximadamente 100 × 60 × 25 mm |
+| Pasta térmica | Aunque el tab sea aislado |
+| Tornillo M3 + arandela | Para fijar el triac al disipador |
+| Placa PCB | FR4 de 1,6 mm, cobre de **2 oz** si conseguís; si no, 1 oz reforzado con estaño |
+| Borneras de tornillo | Paso 7,62 mm, ≥ 16 A, para el lado AC |
+| Bornera o tira de pines | Paso 2,54 mm, para el lado de control |
+| Cable AC | **AWG 14, silicona 200 °C** (el mismo de la lista general) |
+| Cable de control | AWG 22 |
+| Zócalo DIP-6 | Opcional, para no soldar el optoacoplador directo |
+
+---
+
+## 4. Disipación y disipador
+
+El triac cae aproximadamente **1,2 V** cuando conduce, independientemente de la corriente
+(es una juntura, no una resistencia). A 10 A:
+
+```
+P = V_T × I = 1,2 × 10 = 12 W
+```
+
+Doce vatios continuos. Eso es más de lo que parece: es una bombilla halógena pequeña.
+
+Para mantener la juntura por debajo de 125 °C con 40 °C de ambiente:
+
+```
+resistencia térmica total permitida = (125 − 40) / 12 = 7,1 °C/W
+menos la de juntura a cápsula (~1 °C/W) y la de cápsula a disipador (~0,5 °C/W)
+→ el disipador necesita 5,6 °C/W o menos
+```
+
+Pedí **3 °C/W** para tener margen, porque el ambiente dentro de la máquina no va a ser
+40 °C. Y montá el disipador **fuera de la zona caliente del cilindro**, con ventilación.
+
+> Dato útil: como el control es por ancho de pulso, el triac solo disipa esos 12 W cuando
+> el PID pide el 100 %. En régimen estacionario, con el horno mantenido, la potencia
+> media es mucho menor. Pero el disipador se dimensiona para el peor caso.
+
+---
+
+## 5. Reglas de la PCB
+
+Esta es la parte donde se gana o se pierde la seguridad del montaje.
+
+### 5.1 Ancho de pista para 10 A
+
+Según IPC-2221, pista externa, para 10 A:
+
+| Cobre | Aumento de 10 °C | Aumento de 20 °C |
+| :--- | ---: | ---: |
+| 1 oz (35 µm) | **7,2 mm** | 4,7 mm |
+| 2 oz (70 µm) | **3,6 mm** | 2,4 mm |
+
+Son pistas anchísimas. Dos formas de resolverlo:
+
+**Opción A — reforzar con estaño.** Dibujás la pista lo más ancha que te quepa (5 mm
+mínimo), dejás esa zona **sin máscara antisoldante**, acostás encima un alambre de cobre
+desnudo de 1,5–2,5 mm² y lo inundás de estaño. Multiplica la sección efectiva. Es lo que
+se hace en la práctica y es perfectamente válido.
+
+**Opción B — no pasar los 10 A por la placa.** Es lo que hacen los SSR comerciales por
+dentro: la PCB lleva **solo el circuito de disparo**, y los dos cables de potencia llegan
+directamente a las patas MT1 y MT2 del triac, soldados ahí o con terminales de ojillo. El
+triac va atornillado al disipador, no a la placa.
+
+**La opción B es la que recomiendo.** Es más segura, más fácil de fabricar y sigue siendo
+un módulo en PCB. La placa hace su trabajo: aislar y disparar.
+
+### 5.2 Separación entre el lado de control y el lado de red
+
+Esta es la cota crítica del diseño.
+
+| Entre qué | Mínimo | Recomendado |
+| :--- | ---: | ---: |
+| Lado de control ↔ lado de red | 6,4 mm | **8 mm** |
+| Pistas de red de distinto potencial (fase ↔ neutro/carga) | 1,5 mm | **3 mm** |
+
+Y el truco que usan todos los SSR comerciales: **una ranura fresada en la placa, debajo
+del cuerpo del optoacoplador**, entre sus pines 1-2-3 y sus pines 4-5-6. El encapsulado
+DIP-6 solo mide unos 7,6 mm de fila a fila, así que la ranura es lo que te da la
+distancia de fuga real. Si tu fabricante no hace fresados, se puede cortar a mano con una
+sierra de calar fina o con un Dremel.
+
+### 5.3 Las otras reglas
+
+- **Agrupá todo el lado de red en un extremo** de la placa. Una línea imaginaria divide
+  la placa en dos, y nada de control cruza a la zona de red ni al revés.
+- **Serigrafía la zona peligrosa.** Un recuadro con `120 V` impreso o dibujado con
+  marcador. Vos sabés dónde está; el que agarre la placa dentro de seis meses, no.
+- **Limpiá el flux.** El residuo de flux es higroscópico y conductivo: te arruina la
+  distancia de fuga que tanto cuidaste. Alcohol isopropílico y cepillo.
+- **Barniz protector** sobre la zona de red, si conseguís. Después de limpiar, nunca
+  antes.
+- **Agujeros de montaje** separados de cualquier pista de red, y con tornillos aislantes
+  o con distancia suficiente.
+- **Descarga de tracción** para los cables de red: un agujero por donde pase el cable y
+  se le haga un nudo, o una abrazadera. Un tirón nunca debe llegar a la soldadura.
+
+---
+
+## 6. Orden de construcción y prueba
+
+### Etapa A — Lado de control, en protoboard
+
+Solo el optoacoplador y su resistencia. Nada de red en ningún lado.
+
+```
+GPIO23 ──[330 Ω]── pin 1 (MOC3063)
+GND    ─────────── pin 2 (MOC3063)
+```
+
+Cargá el sketch `prueba_ssr` y medí con el multímetro en **miliamperios DC** en serie con
+la resistencia, con el comando `ON`. Deberías leer **5 a 7 mA**. Si lees menos de 5 mA, el
+optoacoplador no va a disparar confiablemente: bajá la resistencia a 270 Ω.
+
+### Etapa B — Montaje de la placa, sin energizar
+
+Soldá todo. Después, con el multímetro en continuidad, verificá:
+
+| Qué medir | Resultado esperado |
+| :--- | :--- |
+| Pin 1 o 2 del optoacoplador contra cualquier punto del lado de red | **Sin continuidad.** Si hay, parás y revisás |
+| Terminal de fase contra terminal de carga, en reposo | Sin continuidad (el triac está abierto) |
+| Tab del triac contra los terminales de red | Sin continuidad, si usaste BTA |
+| Visual: distancia mínima entre cobre de control y cobre de red | ≥ 6,4 mm en todos los puntos |
+
+### Etapa C — Primera prueba con carga, pero **no** con la resistencia
+
+Usá una **bombilla incandescente de 60 o 100 W** como carga en lugar de las resistencias
+de la palomitera. Razones:
+
+- Consume menos de 1 A, así que un error no funde nada.
+- **Ves el ciclo de trabajo directamente en el brillo.** Al 25 % parpadea notoriamente, al
+  100 % queda fija. Es la mejor herramienta de diagnóstico que vas a tener.
+- Si el triac se queda enganchado (falla común), lo ves de inmediato: la bombilla no se
+  apaga con el comando `OFF`.
+
+Corré el barrido `AUTO` del sketch de prueba y observá. Tomacorriente con diferencial, y
+presente todo el tiempo.
+
+### Etapa D — Carga real
+
+Recién ahora las resistencias. Con `P100` sostenido durante 10 minutos, tocá el disipador:
+debería estar caliente pero **soportable al tacto por un segundo**. Si no lo podés tocar,
+el disipador es chico.
+
+Mejor todavía: medí con el termopar apoyado en el disipador. Por encima de 80 °C, agrandá.
+
+---
+
+## 7. Si algo sale mal
+
+| Síntoma | Causa probable |
+| :--- | :--- |
+| La carga nunca enciende | Corriente insuficiente en el LED del optoacoplador. Medí los mA. O el optoacoplador está al revés: el pin 1 se identifica por la muesca del encapsulado |
+| La carga **nunca se apaga** | El triac se destruyó en cortocircuito, casi siempre por falta de snubber o por sobretemperatura. Desconectá de la red **ya**. Un triac en corto es el modo de falla peligroso: el ESP32 pierde todo control y solo te queda el bimetálico |
+| Enciende de forma errática | Falta el snubber, o ruido en la puerta. Agregá la resistencia de 1 kΩ entre puerta y MT1 |
+| El disipador quema | Subdimensionado, o falta pasta térmica, o el tornillo está flojo |
+| Se dispara el diferencial | Fuga a tierra. Revisá si usaste BTB en lugar de BTA, y el aislamiento de todo el lado de red |
+
+> **El modo de falla que importa:** un triac muerto queda en cortocircuito, no en
+> circuito abierto. Es decir, la resistencia queda encendida permanentemente y el
+> firmware no puede hacer nada. Por eso el bimetálico y el fusible térmico siguen siendo
+> imprescindibles: son las únicas protecciones que no dependen del semiconductor.

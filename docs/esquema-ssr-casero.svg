@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220 680" width="1220" height="680" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <style>
+    .bg   { fill: #ffffff; }
+    .zonaDC { fill: #eef5fc; stroke: #1f618d; stroke-width: 2; }
+    .zonaAC { fill: #fdf3f0; stroke: #b03a2e; stroke-width: 2; }
+    .ttlDC { fill: #1f618d; font-size: 16px; font-weight: 700; }
+    .ttlAC { fill: #b03a2e; font-size: 16px; font-weight: 700; }
+    .box  { fill: #ffffff; stroke: #2c3e50; stroke-width: 1.6; }
+    .boxk { fill: #fdecea; stroke: #b03a2e; stroke-width: 1.8; }
+    .boxo { fill: #fef9e7; stroke: #b7950b; stroke-width: 2; }
+    .wDC  { stroke: #1f618d; stroke-width: 2.2; fill: none; stroke-linecap: round; }
+    .wAC  { stroke: #b03a2e; stroke-width: 2.8; fill: none; stroke-linecap: round; }
+    .barrera { stroke: #b7950b; stroke-width: 2.5; fill: none; stroke-dasharray: 9 6; }
+    .lblb { fill: #1a1a1a; font-size: 14px; font-weight: 600; }
+    .sml  { fill: #5d6d7e; font-size: 11.5px; }
+    .pin  { fill: #1f618d; font-size: 11.5px; font-weight: 600; }
+    .pinR { fill: #b03a2e; font-size: 11.5px; font-weight: 600; }
+    .note { fill: #5d6d7e; font-size: 12px; }
+    .warn { fill: #b03a2e; font-size: 12.5px; font-weight: 600; }
+    .node { fill: #b03a2e; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1220" height="680"/>
+
+  <!-- zonas -->
+  <rect class="zonaDC" x="20" y="48" width="540" height="590" rx="8"/>
+  <rect class="zonaAC" x="560" y="48" width="640" height="590" rx="8"/>
+  <text class="ttlDC" x="40" y="78">LADO DE CONTROL — 3,3 V</text>
+  <text class="ttlAC" x="580" y="78">LADO DE RED — 120 V</text>
+  <text class="warn"  x="580" y="98">Nunca en protoboard. Ni a 10 A ni a 10 mA.</text>
+
+  <!-- barrera de aislamiento -->
+  <path class="barrera" d="M560 48 V638"/>
+  <text class="note" x="566" y="628">barrera de aislamiento: solo luz la cruza</text>
+
+  <!--  CONTROL -->
+  <rect class="box" x="60" y="218" width="112" height="42" rx="4"/>
+  <text class="lblb" x="116" y="244" text-anchor="middle">GPIO23</text>
+  <path class="wDC" d="M172 239 H242"/>
+
+  <rect class="box" x="242" y="227" width="64" height="24" rx="3"/>
+  <text class="sml" x="274" y="218" text-anchor="middle">330 Ω</text>
+  <path class="wDC" d="M306 239 H470"/>
+
+  <rect class="box" x="60" y="288" width="112" height="42" rx="4"/>
+  <text class="lblb" x="116" y="314" text-anchor="middle">GND</text>
+  <path class="wDC" d="M172 309 H470"/>
+
+  <text class="note" x="116" y="366" text-anchor="middle">del ESP32</text>
+
+  <!--  OPTOACOPLADOR -->
+  <text class="lblb" x="560" y="188" text-anchor="middle">MOC3063</text>
+  <text class="sml"  x="560" y="205" text-anchor="middle">optoacoplador con detección de cruce por cero</text>
+  <rect class="boxo" x="470" y="214" width="180" height="120" rx="5"/>
+  <text class="pin"  x="478" y="235">1</text>
+  <text class="pin"  x="478" y="305">2</text>
+  <text class="pinR" x="634" y="235">6</text>
+  <text class="pinR" x="634" y="305">4</text>
+  <text class="sml"  x="512" y="278" text-anchor="middle">LED</text>
+  <text class="sml"  x="608" y="272" text-anchor="middle">fototriac</text>
+  <text class="sml"  x="608" y="288" text-anchor="middle">+ cruce 0</text>
+  <text class="note" x="560" y="360" text-anchor="middle">ranura fresada en la placa bajo el cuerpo</text>
+
+  <!--  RED -->
+  <!-- terminal de entrada -->
+  <rect class="boxk" x="596" y="118" width="128" height="44" rx="4"/>
+  <text class="lblb" x="660" y="140" text-anchor="middle">FASE</text>
+  <text class="sml"  x="660" y="155" text-anchor="middle">del bimetálico</text>
+  <path class="wAC" d="M724 140 H1164"/>
+
+  <!-- terminal de salida -->
+  <rect class="boxk" x="596" y="558" width="176" height="44" rx="4"/>
+  <text class="lblb" x="684" y="580" text-anchor="middle">A RESISTENCIAS</text>
+  <text class="sml"  x="684" y="595" text-anchor="middle">y de ahí al neutro</text>
+  <path class="wAC" d="M772 580 H1164"/>
+
+  <!-- rama del pin 6: resistencia de puerta a la fase -->
+  <path class="wAC" d="M650 239 H676"/>
+  <rect class="box" x="676" y="227" width="64" height="24" rx="3"/>
+  <text class="sml" x="708" y="220" text-anchor="middle">180 Ω · 1 W</text>
+  <path class="wAC" d="M740 239 H792 V140"/>
+  <circle class="node" cx="792" cy="140" r="5"/>
+
+  <!-- rama del pin 4: a la puerta del triac -->
+  <path class="wAC" d="M650 309 H724 V352 H844"/>
+  <text class="pinR" x="800" y="344" text-anchor="middle">G</text>
+
+  <!-- triac -->
+  <rect class="box" x="844" y="302" width="176" height="104" rx="4"/>
+  <text class="lblb" x="932" y="332" text-anchor="middle">TRIAC</text>
+  <text class="sml"  x="932" y="352" text-anchor="middle">BTA41-600B</text>
+  <text class="sml"  x="932" y="370" text-anchor="middle">tab aislado</text>
+  <text class="sml"  x="932" y="390" text-anchor="middle">sobre disipador ≥ 3 °C/W</text>
+  <path class="wAC" d="M932 302 V140"/>
+  <circle class="node" cx="932" cy="140" r="5"/>
+  <path class="wAC" d="M932 406 V580"/>
+  <circle class="node" cx="932" cy="580" r="5"/>
+  <text class="pinR" x="944" y="296">MT2</text>
+  <text class="pinR" x="944" y="424">MT1</text>
+
+  <!-- snubber -->
+  <path class="wAC" d="M1072 140 V246"/>
+  <circle class="node" cx="1072" cy="140" r="5"/>
+  <rect class="box" x="1060" y="246" width="24" height="58" rx="3"/>
+  <text class="sml" x="1050" y="280" text-anchor="end">100 Ω · 2 W</text>
+  <path class="wAC" d="M1072 304 V348"/>
+  <path class="wAC" d="M1050 348 H1094"/>
+  <path class="wAC" d="M1050 364 H1094"/>
+  <text class="sml" x="1090" y="400">100 nF X2</text>
+  <path class="wAC" d="M1072 364 V580"/>
+  <circle class="node" cx="1072" cy="580" r="5"/>
+  <text class="note" x="1072" y="622" text-anchor="middle">snubber</text>
+
+  <!-- varistor -->
+  <path class="wAC" d="M1164 140 V300"/>
+  <rect class="box" x="1140" y="300" width="48" height="54" rx="3"/>
+  <text class="sml" x="1164" y="332" text-anchor="middle">MOV</text>
+  <path class="wAC" d="M1164 354 V580"/>
+  <text class="note" x="1164" y="622" text-anchor="middle">130 VAC</text>
+</svg>

@@ -43,7 +43,7 @@ cableado que unía la resistencia pequeña con esa placa. Ya no cumplen función
 
 | Componente | Especificación | Cant. |
 | :--- | :--- | ---: |
-| Relé de estado sólido SSR-25 DA | Entrada 3–32 VDC, salida 24–380 VAC | 1 |
+| Relé de estado sólido | SSR-25 DA comercial, **o** el construido en PCB — ver [`ssr-casero.md`](ssr-casero.md) | 1 |
 | Disipador para el relé | Aluminio con aletas, mínimo 50 × 50 × 30 mm | 1 |
 | Pasta térmica | Entre relé y disipador | 1 |
 | Fuente AC-DC aislada de 12 V | ≥ 1 A (HLK-10M12 u open-frame de 12 V / 2 A) | 1 |

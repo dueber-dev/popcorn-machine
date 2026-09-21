@@ -20,6 +20,7 @@ Proyecto académico de la materia de Circuitos.
 | Firmware de control | Primera versión, sin probar en hardware |
 | Prueba 1 — relé solo | **Funciona.** El relé dispara a 3,3 V |
 | Prueba 2 — termopar + potencia manual | Sketch listo — ver [`prueba_termopar`](firmware/prueba_termopar/prueba_termopar.ino) |
+| Relé construido en PCB | Diseño listo — ver [`ssr-casero.md`](docs/ssr-casero.md) |
 | Medición de resistencias | Pendiente — bloquea el cableado AC |
 | Armado | Pendiente |
 | Sintonización PID | Pendiente |
@@ -37,6 +38,9 @@ docs/
   esquema-de-conexiones.md                Lista de materiales, tabla de conexiones
                                           terminal por terminal y verificaciones.
   esquema.svg                             Diagrama para imprimir.
+  ssr-casero.md                           Construcción del relé de estado sólido
+                                          en PCB, con su propia lista de materiales.
+  esquema-ssr-casero.svg                  Esquemático de ese relé.
   guia-de-armado.md                       Topología vigente (motor con fuente DC
                                           propia), cálculos y orden de armado.
 firmware/
