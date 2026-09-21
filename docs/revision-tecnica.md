@@ -23,8 +23,8 @@ la placa: si lo sacás del camino común, deja de cumplir su función original.
 y el nodo donde se bifurcan los dos ramales:
 
 ```
-[Fase] → [Interruptor] → [Fusible térmico 15 A] → [Bimetálico] → ┬─→ [R pequeña] → [Puente] → [Motor] → [Neutro]
-                                                                 └─→ [R grande] → [SSR 1|2] → [Neutro]
+[Fase] → [Interruptor] → [Fusible térmico 15 A] → [Bimetálico] → ┬─→ [Resistencia pequeña] → [Puente de diodos] → [Motor] → [Neutro]
+                                                                 └─→ [Resistencia grande] → [Relé de estado sólido] → [Neutro]
 ```
 
 ---

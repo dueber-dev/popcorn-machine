@@ -54,7 +54,7 @@ en [`docs/revision-tecnica.md`](docs/revision-tecnica.md):
 1. **A1** — El fusible térmico de 15 A va en serie con el ramal de calor; el ramal DC
    lleva su propio fusible de 1 A.
 2. **A2** — *Resuelto* por la topología nueva: el motor ya no depende de las
-   resistencias. En su lugar hay que medirlas y comprobar que `R_paralelo ≥ 12 Ω`.
+   resistencias. En su lugar hay que medirlas y comprobar que su paralelo da 12 Ω o más.
 3. **A3** — El MAX6675 se alimenta a **3,3 V**. A 5 V daña el GPIO19 del ESP32.
 4. **A4** — Pulldown de 10 kΩ entre GPIO23 y GND, o el SSR puede dispararse durante el
    boot del ESP32.
@@ -79,7 +79,7 @@ El checklist completo de primer encendido está al final de la revisión técnic
 | `SO`  | `GPIO19` |
 | `T+` / `T-` | Termopar tipo K, **junta aislada** |
 
-| SSR-25DA | ESP32 |
+| Relé de estado sólido | ESP32 |
 | :--- | :--- |
 | Terminal 3 `(+)` | `GPIO23` *(+ pulldown 10 kΩ a GND)* |
 | Terminal 4 `(-)` | `GND` |
@@ -88,21 +88,21 @@ El checklist completo de primer encendido está al final de la revisión técnic
 
 El motor sale por completo del circuito AC: se eliminan la resistencia-divisor y el
 puente de diodos de su camino y se alimenta con fuente DC propia. Las dos resistencias
-quedan en paralelo y el SSR conmuta el tronco común.
+quedan en paralelo y el relé de estado sólido conmuta el tronco común.
 
 ```
-[Fase] → [Interruptor] → ┬─→ [Fusible 1 A] → [Fuente 12 V] ─┬─→ [Motor ventilador]
+[Fase] → [Interruptor] → ┬─→ [Fusible 1 A] → [Fuente 12 V] ─┬─→ [Motor del ventilador]
                          │                                   └─→ [Buck 5 V] → [ESP32]
                          │
-                         └─→ [Fusible térmico 15 A] → [Bimetálico] → [SSR 1|2] → [R grande ∥ R pequeña] → [Neutro]
+                         └─→ [Fusible térmico 15 A] → [Bimetálico] → [Relé de estado sólido] → [Resistencia grande ∥ Resistencia pequeña] → [Neutro]
 ```
 
 El ramal DC se toma antes del fusible térmico y del bimetálico, así que el ventilador
 sigue soplando —y enfriando el cilindro— aunque cualquiera de los dos corte.
 
 > **Antes de cablear:** medí ambas resistencias y verificá que
-> `R_paralelo = (R1·R2)/(R1+R2) ≥ 12 Ω`. Por debajo de eso el SSR ve más de 10 A.
-> El cálculo completo está en la [guía de armado](docs/guia-de-armado.md).
+> el paralelo `(grande × pequeña) / (grande + pequeña)` da **12 Ω o más**. Por debajo de
+> eso el relé ve más de 10 A. El cálculo está en la [guía de armado](docs/guia-de-armado.md).
 
 ---
 

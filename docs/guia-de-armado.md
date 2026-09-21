@@ -5,8 +5,8 @@ de la [documentación inicial](documentacion_inicial_del_proyecto.md).
 
 **Cambio respecto al diseño original:** el motor del ventilador se saca por completo del
 circuito AC. Se eliminan la resistencia-divisor y el puente de diodos de su camino, y se
-alimenta con una fuente DC propia. Las dos resistencias quedan en paralelo y el SSR
-conmuta el tronco común de ambas.
+alimenta con una fuente DC propia. Las dos resistencias quedan en paralelo y el relé
+de estado sólido conmuta el tronco común de ambas.
 
 Se asume red de **120 V / 60 Hz**. Con 230 V hay que rehacer todos los cálculos de
 corriente de este documento.
@@ -35,12 +35,12 @@ Con la máquina desenchufada y las resistencias desconectadas de todo, medí cad
 el multímetro en ohmios y calculá:
 
 ```
-R_paralelo = (R_grande × R_pequeña) / (R_grande + R_pequeña)
+resistencia combinada = (grande × pequeña) / (grande + pequeña)
 
-I = 120 / R_paralelo          P = 120² / R_paralelo
+corriente = 120 / combinada        potencia = 120² / combinada
 ```
 
-| R_paralelo | Corriente | Potencia | Veredicto |
+| Resistencia combinada | Corriente | Potencia | Veredicto |
 | ---: | ---: | ---: | :--- |
 | 20 Ω | 6,0 A | 720 W | OK |
 | 15 Ω | 8,0 A | 960 W | OK |
@@ -50,7 +50,7 @@ I = 120 / R_paralelo          P = 120² / R_paralelo
 | 8 Ω | 15,0 A | 1800 W | **Funde el fusible de 15 A** |
 | 6 Ω | 20,0 A | 2400 W | **No. Destruye el SSR** |
 
-**Regla:** `R_paralelo ≥ 12 Ω`. Si te da menos, no conectés la resistencia pequeña en
+**Regla:** la resistencia combinada tiene que dar **12 Ω o más**. Si te da menos, no conectés la resistencia pequeña en
 paralelo — dejala fuera.
 
 ### Y revisá la resistencia pequeña por separado
@@ -59,7 +59,7 @@ Antes, la resistencia pequeña tenía el motor en serie, así que veía menos de
 Ahora va directa a la red y disipa más:
 
 ```
-P_nueva = 120² / R_pequeña
+potencia nueva = 120² / resistencia pequeña
 ```
 
 Si era un *dropper* de ~600 Ω, pasa de ~21 W a ~24 W: intrascendente. Si mide mucho
@@ -67,10 +67,10 @@ menos, el elemento va a trabajar bastante por encima de su punto de diseño.
 
 **Criterio de decisión:**
 
-| R_pequeña medida | Qué hacer |
+| Resistencia pequeña medida | Qué hacer |
 | :--- | :--- |
 | Cientos de ohmios (300 Ω – 1 kΩ) | Aporta ~15–50 W. Ponela en paralelo si está físicamente ubicada de forma que reparta mejor el calor en el cilindro; si no, es indiferente |
-| Decenas de ohmios | Recalculá `R_paralelo` con la tabla de arriba antes de decidir |
+| Decenas de ohmios | Recalculá la resistencia combinada con la tabla de arriba antes de decidir |
 | Comparte terminal físico con la grande (3 terminales en total) | **No la conectés en paralelo.** Es una derivación de la misma bobina; ponerla directa a 120 V es un cortocircuito parcial |
 
 Dejarla afuera no es ninguna pérdida: son unos 24 W sobre ~1000 W.
@@ -90,13 +90,13 @@ Dejarla afuera no es ninguna pérdida: son unos 24 W sobre ~1000 W.
    │                                              │
 [Bimetálico]                          [Fuente AC-DC aislada 12 V]
    │                                              │
-[SSR terminal 1]                                  ├──> [Motor ventilador 12 V]
-[SSR terminal 2]                                  │
+[Relé, terminal 1]                                ├──> [Motor del ventilador 12 V]
+[Relé, terminal 2]                                │
    │                                              └──> [Buck 12→5 V] ──> [ESP32]
-   ├──> [R grande]  ──┐                                                     │
-   ├──> [R pequeña] ──┤  (en paralelo, si el cálculo lo permite)           │
-   │                  │                                                     │
-[Neutro] <────────────┘                                          [GND común DC]
+   ├──> [Resistencia grande]  ──┐                                                     │
+   ├──> [Resistencia pequeña] ──┤  (en paralelo, si el cálculo lo permite)           │
+   │                            │                                                     │
+[Neutro] <──────────────────────┘                                          [GND común DC]
 ```
 
 **Puntos clave del orden:**
@@ -120,7 +120,7 @@ aparato terminado tiene **un solo cable a la pared**.
 
 | Qué | Componente | Notas |
 | :--- | :--- | :--- |
-| 12 V para el motor | Módulo AC-DC aislado de 12 V, ≥ 1 A (HLK-10M12, o cualquier fuente open-frame de 12 V / 2 A) | Dimensionar al doble de la corriente medida en la Etapa 2. Si el motor resulta ser de 24 V, fuente de 24 V |
+| 12 V para el motor | Fuente AC-DC aislada de 12 V, ≥ 1 A (HLK-10M12, u open-frame de 12 V / 2 A) | Dimensionar al doble de la corriente medida en la Etapa 2. Si el motor resulta ser de 24 V, fuente de 24 V |
 | 5 V para el ESP32 | Convertidor buck MP1584 o LM2596 colgado de los 12 V | Entra al pin `5V`/`VIN`, no al `3V3` |
 | 3,3 V para el MAX6675 | Regulador de la propia placa ESP32 | Pin `3V3` (ver A3) |
 | Protección | Fusible de 1 A en el ramal DC | El de 15 A nunca protegería un consumo de < 1 A |
@@ -161,7 +161,7 @@ puede hacer control de fase.
 | `GND` | `GND` |
 | `SCK` / `CS` / `SO` | `GPIO18` / `GPIO5` / `GPIO19` |
 
-| SSR-25DA | ESP32 |
+| Relé de estado sólido | ESP32 |
 | :--- | :--- |
 | Terminal 3 `(+)` | `GPIO23` **+ pulldown 10 kΩ a GND** (ver A4) |
 | Terminal 4 `(-)` | `GND` |
@@ -174,7 +174,7 @@ puede hacer control de fase.
 
 1. **Fotografiá el cableado original completo** antes de desconectar nada. Vas a
    necesitarlo.
-2. Medí `R_grande` y `R_pequeña` por separado. Anotá los valores.
+2. Medí la resistencia grande y la pequeña por separado. Anotá los valores.
 3. Contá los terminales del plato de resistencias: 4 = independientes, 3 = derivadas.
 4. Aplicá la tabla de arriba y decidí si la pequeña entra en paralelo o se queda fuera.
 5. Identificá los terminales del bimetálico y del fusible térmico.
@@ -182,7 +182,7 @@ puede hacer control de fase.
    las salidas del puente de diodos con ella encendida. Si ya la desarmaste, anotá lo
    que diga la etiqueta del motor; si no dice nada, Etapa 2.
 
-> Criterio de parada: si `R_paralelo` te da menos de 12 Ω con las dos en paralelo, parás
+> Criterio de parada: si la resistencia combinada te da menos de 12 Ω, parás
 > acá y replanteás. No cableés "a ver qué pasa".
 
 ### Etapa 1 — Control en banco, sin nada de AC
@@ -228,7 +228,7 @@ Con el enchufe **fuera** de la pared todo el tiempo:
    estaño en la zona caliente.
 2. Con el multímetro en continuidad, verificá:
    - Fase a Neutro con el interruptor abierto: **sin continuidad**.
-   - Fase a Neutro con el interruptor cerrado: debe dar `R_paralelo` (el SSR en reposo
+   - Fase a Neutro con el interruptor cerrado: debe dar la resistencia combinada (el relé en reposo
      tiene fuga, pero medís a través de las resistencias si puenteás el SSR; si no,
      medí cada tramo por separado).
    - Cualquier terminal AC contra el chasis metálico: **sin continuidad**. Si hay,

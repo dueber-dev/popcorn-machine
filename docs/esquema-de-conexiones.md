@@ -5,8 +5,9 @@ Documento de referencia para el armado. Diagrama visual:
 
 Red asumida: **120 V / 60 Hz**.
 
-> Antes de cablear el lado AC tenés que haber hecho la medición de la Etapa 0 de la
-> [guía de armado](guia-de-armado.md) y confirmado que `R_paralelo ≥ 12 Ω`.
+> Antes de cablear el lado AC tenés que haber medido las dos resistencias y confirmado
+> que su valor combinado en paralelo es de **12 Ω o más**. El cálculo está en la
+> [guía de armado](guia-de-armado.md).
 
 ---
 
@@ -14,64 +15,64 @@ Red asumida: **120 V / 60 Hz**.
 
 ### 1.1 Se recupera de la palomitera
 
-| # | Componente | Nota |
-| :--- | :--- | :--- |
-| R1 | Resistencia principal (grande) | Medir antes de reutilizar |
-| R2 | Resistencia auxiliar (pequeña) | Solo si el cálculo del paralelo lo permite |
-| FT1 | Fusible térmico 15 A | No reemplazar por uno de mayor corriente |
-| BM1 | Termostato bimetálico | Se conserva como protección independiente |
-| M1 | Motor del ventilador | Ahora alimentado en DC desde fuente propia |
-| SW1 | Interruptor AC | Verificar que corte la fase |
-| — | Cable de red con clavija | Reemplazar si el aislamiento está reseco |
-| — | Cilindro de aluminio y soportes de mica | Conservar los aislantes originales |
+| Componente | Nota |
+| :--- | :--- |
+| Resistencia grande | Medir antes de reutilizar |
+| Resistencia pequeña | Solo si el cálculo del paralelo lo permite |
+| Fusible térmico de 15 A | No reemplazar por uno de mayor corriente |
+| Termostato bimetálico | Se conserva como protección independiente |
+| Motor del ventilador | Ahora alimentado en DC desde fuente propia |
+| Interruptor general | Verificar que corte la fase |
+| Cable de red con clavija | Reemplazar si el aislamiento está reseco |
+| Cilindro de aluminio y soportes de mica | Conservar los aislantes originales |
 
-**Se descarta:** la placa rectificadora del motor (puente de diodos D1–D4) y todo el
-cableado que unía R2 con esa placa. Ya no cumplen función.
+**Se descarta:** la placa rectificadora del motor (el puente de cuatro diodos) y todo el
+cableado que unía la resistencia pequeña con esa placa. Ya no cumplen función.
 
 ### 1.2 Electrónica de control
 
-| # | Componente | Especificación | Cant. |
-| :--- | :--- | :--- | ---: |
-| U1 | ESP32 DevKit | v1, 30 o 38 pines | 1 |
-| U2 | Módulo MAX6675 | HW-550 | 1 |
-| TC1 | Sonda termopar tipo K | **Junta aislada (ungrounded)**, vaina de acero inoxidable, rango ≥ 400 °C, con rosca M6 u M8 | 1 |
-| R3 | Resistencia 10 kΩ | 1/4 W, pulldown de GPIO23 | 1 |
-| — | *(opcional)* MOSFET 2N7000 + resistencia 1 kΩ | Solo si el SSR no dispara bien a 3,3 V | 1 |
+| Componente | Especificación | Cant. |
+| :--- | :--- | ---: |
+| ESP32 DevKit | v1, 30 o 38 pines | 1 |
+| Módulo MAX6675 | También vendido como HW-550 | 1 |
+| Sonda termopar tipo K | **Junta aislada (ungrounded)**, vaina de acero inoxidable, rango ≥ 400 °C, con rosca M6 u M8 | 1 |
+| Resistencia de 10 kΩ | 1/4 W, pulldown del pin de disparo | 1 |
+| *(opcional)* MOSFET 2N7000 + resistencia de 1 kΩ | Solo si el relé de estado sólido no dispara bien a 3,3 V | 1 |
 
 ### 1.3 Potencia y alimentación
 
-| # | Componente | Especificación | Cant. |
-| :--- | :--- | :--- | ---: |
-| SSR1 | Relé de estado sólido | SSR-25 DA — entrada 3–32 VDC, salida 24–380 VAC | 1 |
-| — | Disipador para SSR | Aluminio con aletas, mínimo 50 × 50 × 30 mm | 1 |
-| — | Pasta térmica | Para la interfaz SSR–disipador | 1 |
-| PS1 | Fuente AC-DC aislada | 12 V, ≥ 1 A (HLK-10M12 o open-frame 12 V / 2 A) | 1 |
-| PS2 | Convertidor buck | MP1584EN o LM2596 ajustable, salida fijada a 5,0 V | 1 |
-| F1 | Portafusible + fusible | Vidrio 5 × 20 mm, 1 A / 250 V, para el ramal DC | 1 |
-| C1 | Condensador cerámico 100 nF | 50 V, directo en las terminales del motor | 1 |
-| C2 | Condensador electrolítico 470–1000 µF | 25 V, en el riel de +12 V | 1 |
+| Componente | Especificación | Cant. |
+| :--- | :--- | ---: |
+| Relé de estado sólido SSR-25 DA | Entrada 3–32 VDC, salida 24–380 VAC | 1 |
+| Disipador para el relé | Aluminio con aletas, mínimo 50 × 50 × 30 mm | 1 |
+| Pasta térmica | Entre relé y disipador | 1 |
+| Fuente AC-DC aislada de 12 V | ≥ 1 A (HLK-10M12 u open-frame de 12 V / 2 A) | 1 |
+| Convertidor buck 12 → 5 V | MP1584EN o LM2596 ajustable | 1 |
+| Portafusible + fusible de 1 A / 250 V | Vidrio 5 × 20 mm, para el ramal DC | 1 |
+| Condensador cerámico de 100 nF | 50 V, en las terminales del motor | 1 |
+| Condensador electrolítico de 470–1000 µF | 25 V, en la línea de 12 V | 1 |
 
-**C1 y C2 son supresión de ruido, no filtrado de alimentación.** PS1 y el buck ya
-entregan DC limpia por su cuenta. Lo que hay que apagar es el chisporroteo de las
-escobillas del motor: el MAX6675 amplifica **41 µV por grado**, y ese ruido, acoplado por
-el cableado, se ve como saltos en la lectura de temperatura. C1 va soldado lo más cerca
-posible de las terminales del motor; C2 en el riel, cerca del buck. Respetá la polaridad
-de C2.
+**Los dos condensadores son supresión de ruido, no filtrado de alimentación.** La fuente
+de 12 V y el buck ya entregan DC limpia por su cuenta. Lo que hay que apagar es el
+chisporroteo de las escobillas del motor: el MAX6675 amplifica **41 µV por grado**, y ese
+ruido, acoplado por el cableado, se ve como saltos en la lectura de temperatura. El
+cerámico va soldado lo más cerca posible de las terminales del motor; el electrolítico en
+la línea de 12 V, cerca del buck, respetando la polaridad.
 
-La corriente de PS1 se define en la Etapa 2, cuando midas el consumo real del motor.
-Comprá al doble de esa corriente. Si el motor resulta ser de 24 V, PS1 de 24 V y el buck
-igual a 5 V.
+La corriente de la fuente de 12 V se define cuando midas el consumo real del motor
+(Etapa 2 de la guía de armado). Comprá al doble de esa corriente. Si el motor resulta ser
+de 24 V, fuente de 24 V y el buck igual a 5 V.
 
 ### 1.4 Cableado y conexión
 
 | Componente | Especificación | Dónde |
 | :--- | :--- | :--- |
 | Cable de potencia | **AWG 14, aislamiento de silicona o fibra de vidrio, 200 °C** | Todo el ramal de calor |
-| Cable de señal DC | AWG 22–24 | ESP32 ↔ MAX6675 ↔ SSR |
-| Cable del motor | AWG 20 | PS1 → M1 |
+| Cable de señal DC | AWG 22–24 | ESP32 ↔ MAX6675 ↔ relé |
+| Cable del motor | AWG 20 | Fuente de 12 V → motor |
 | Terminales Faston hembra | Aislados, para crimpar, 6,3 mm | Resistencias, bimetálico, fusible |
-| Terminales de ojillo | Para crimpar | Tornillos del SSR |
-| Clemas cerámicas (porcelana) | 2 o 3 vías | Nodos N1, N2 y N3 en zona caliente |
+| Terminales de ojillo | Para crimpar | Tornillos del relé |
+| Clemas cerámicas (porcelana) | 2 o 3 vías | Los tres puntos de reparto en zona caliente |
 | Termorretráctil | Varios diámetros | Solo zona fría |
 | Prensaestopas / pasacables | Para el cable de red | Entrada a la carcasa |
 | Pasamuros aislante | Cerámico o teflón | Entrada del termopar al cilindro |
@@ -96,88 +97,103 @@ Ver [`esquema.svg`](esquema.svg) para la versión gráfica. En texto:
   POTENCIA 120 V AC
   ─────────────────────────────────────────────────────────────────────────────
 
-  [TOMA L] ──> [SW1 Interruptor] ──┬─────────────────────── riel FASE ─────────┐
-                                   │                                           │
-              (rung 1, ramal DC)   ├──> [F1 1 A] ──> [PS1 Fuente 12 V] ────────┤
-                                   │                        │                  │
-                                   │                   +12 V / GND             │
-                                   │                   (va al panel DC)        │
-                                   │                                           │
-              (rung 2, calor)      ├──> [FT1 15 A] ──> [BM1] ──> [SSR1 1|2] ──>│
-                                   │                                  │        │
-                                   │                                  N2       │
-                                   │                                  ├─ [R1] ─┤
-                                   │                                  └─ [R2] ─┤
-                                   │                                           │
-  [TOMA N] ────────────────────────┴──────────────── riel NEUTRO ──────────────┘
+  [Clavija, fase] ──> [Interruptor] ──┬──────────────── línea de FASE ─────────┐
+                                      │                                        │
+       (ramal de alimentación)        ├──> [Fusible 1 A] ──> [Fuente 12 V] ────┤
+                                      │                           │            │
+                                      │                    +12 V / tierra      │
+                                      │                    (va al panel DC)    │
+                                      │                                        │
+       (ramal de calor)               ├──> [Fusible térmico 15 A]              │
+                                      │            │                           │
+                                      │            v                           │
+                                      │       [Bimetálico]                     │
+                                      │            │                           │
+                                      │            v                           │
+                                      │   [Relé de estado sólido]              │
+                                      │            │                           │
+                                      │   Clema de resistencias                │
+                                      │            ├──> [Resistencia grande] ──┤
+                                      │            └──> [Resistencia pequeña] ─┤
+                                      │                                        │
+  [Clavija, neutro] ──────────────────┴─────────── línea de NEUTRO ────────────┘
 
-  [TOMA PE] ──> chasis metálico
+  [Clavija, tierra] ──> chasis metálico
 
 
   CONTROL DC
   ─────────────────────────────────────────────────────────────────────────────
 
-  +12 V ──┬──> [M1 Motor]
-          └──> [PS2 Buck 12→5 V] ──> [U1 ESP32 VIN]
+  +12 V ──┬──> [Motor del ventilador]
+          └──> [Buck 12 → 5 V] ──> [ESP32, pin VIN]
 
-  [U1 ESP32] ──3V3/GND/GPIO18/GPIO5/GPIO19──> [U2 MAX6675] ──T+/T−──> [TC1]
-             ──GND─────────────────────────> [SSR1 term. 4 (−)]
-             ──GPIO23──┬──────────────────> [SSR1 term. 3 (+)]
-                       └── [R3 10 kΩ] ──> GND
+  [ESP32] ──3V3 / GND / GPIO18 / GPIO5 / GPIO19──> [MAX6675] ──T+ / T−──> [Termopar]
+          ──GND──────────────────────────────────> [Relé, terminal 4 (−)]
+          ──GPIO23──┬────────────────────────────> [Relé, terminal 3 (+)]
+                    └── [Resistencia 10 kΩ] ──> tierra
 
-  GND ────────────────────────────────────── riel común DC
+  tierra ─────────────────────────────────────── línea común DC
 ```
 
 **Por qué este orden:**
 
-- El ramal DC sale **antes** de FT1 y BM1. El ventilador sigue soplando aunque el
-  bimetálico abra o el fusible térmico se funda, y puede enfriar el cilindro.
-- BM1 va **antes** del SSR, para que el SSR ni reciba AC cuando el bimetálico esté
-  abierto.
-- El SSR va del lado de **fase**, no de neutro. Así, con el SSR abierto, las resistencias
-  quedan al potencial de neutro y no energizadas.
-- R1 y R2 en paralelo, ambas aguas abajo del SSR.
+- El ramal de alimentación sale **antes** del fusible térmico y del bimetálico. El
+  ventilador sigue soplando aunque el bimetálico abra o el fusible térmico se funda, y
+  puede enfriar el cilindro.
+- El bimetálico va **antes** del relé, para que el relé ni reciba AC cuando el bimetálico
+  esté abierto.
+- El relé va del lado de **fase**, no de neutro. Así, con el relé abierto, las
+  resistencias quedan al potencial de neutro y no energizadas.
+- Las dos resistencias en paralelo, ambas aguas abajo del relé.
 
 ---
 
 ## 3. Tabla de conexiones
 
+Los tres puntos de reparto se arman con clemas cerámicas y se nombran así:
+
+| Nombre | Dónde queda |
+| :--- | :--- |
+| **Clema de reparto** | Justo después del interruptor. De aquí salen los dos ramales |
+| **Clema de resistencias** | Entre la salida del relé y las dos resistencias |
+| **Clema de neutro** | Donde se juntan los retornos antes de ir al neutro de la clavija |
+
 ### 3.1 Lado AC — cable AWG 14 silicona, terminales crimpados
 
 | # | Desde | Hasta |
 | ---: | :--- | :--- |
-| 1 | Clavija, conductor **L** (fase) | SW1 terminal 1 |
-| 2 | SW1 terminal 2 | Nodo **N1** (clema cerámica de 3 vías) |
-| 3 | N1 | F1 portafusible, terminal A |
-| 4 | F1 terminal B | PS1 entrada **L** |
-| 5 | N1 | FT1 fusible térmico, terminal A |
-| 6 | FT1 terminal B | BM1 bimetálico, terminal A |
-| 7 | BM1 terminal B | **SSR1 terminal 1** (carga AC) |
-| 8 | **SSR1 terminal 2** | Nodo **N2** (clema cerámica de 3 vías) |
-| 9 | N2 | R1 resistencia grande, terminal A |
-| 10 | N2 | R2 resistencia pequeña, terminal A *(omitir si el cálculo no da)* |
-| 11 | R1 terminal B | Nodo **N3** (clema cerámica de 3 vías) |
-| 12 | R2 terminal B | N3 *(omitir junto con la 10)* |
-| 13 | N3 | Clavija, conductor **N** (neutro) |
-| 14 | PS1 entrada **N** | N3 |
-| 15 | Clavija, conductor **PE** (tierra) | Chasis metálico, tornillo con arandela dentada |
+| 1 | Clavija, conductor de **fase** | Interruptor, terminal 1 |
+| 2 | Interruptor, terminal 2 | **Clema de reparto** |
+| 3 | Clema de reparto | Portafusible de 1 A, terminal A |
+| 4 | Portafusible de 1 A, terminal B | Fuente de 12 V, entrada **L** |
+| 5 | Clema de reparto | Fusible térmico de 15 A, terminal A |
+| 6 | Fusible térmico, terminal B | Bimetálico, terminal A |
+| 7 | Bimetálico, terminal B | **Relé de estado sólido, terminal 1** (carga AC) |
+| 8 | **Relé de estado sólido, terminal 2** | **Clema de resistencias** |
+| 9 | Clema de resistencias | Resistencia grande, terminal A |
+| 10 | Clema de resistencias | Resistencia pequeña, terminal A *(omitir si el cálculo no da)* |
+| 11 | Resistencia grande, terminal B | **Clema de neutro** |
+| 12 | Resistencia pequeña, terminal B | Clema de neutro *(omitir junto con la 10)* |
+| 13 | Clema de neutro | Clavija, conductor de **neutro** |
+| 14 | Fuente de 12 V, entrada **N** | Clema de neutro |
+| 15 | Clavija, conductor de **tierra** | Chasis metálico, tornillo con arandela dentada |
 
 ### 3.2 Alimentación DC — cable AWG 20
 
 | # | Desde | Hasta |
 | ---: | :--- | :--- |
-| 16 | PS1 salida **+V** (12 V) | Riel **+12 V** |
-| 17 | PS1 salida **−V** | Riel **GND** |
-| 18 | Riel +12 V | M1 motor, terminal **+** |
-| 19 | Riel GND | M1 motor, terminal **−** |
-| 20 | Riel +12 V | PS2 buck, **IN+** |
-| 21 | Riel GND | PS2 buck, **IN−** |
-| 22 | PS2 **OUT+** *(ajustado a 5,0 V antes de conectar)* | U1 ESP32, pin **`VIN`** / **`5V`** |
-| 23 | PS2 **OUT−** | U1 ESP32, pin **`GND`** |
-| 23a | C1 (100 nF), una pata | M1 motor, terminal **+**, soldado en la terminal misma |
-| 23b | C1, otra pata | M1 motor, terminal **−** |
-| 23c | C2 (470–1000 µF), pata **+** | Riel +12 V, cerca del buck |
-| 23d | C2, pata **−** | Riel GND |
+| 16 | Fuente de 12 V, salida **+V** | Línea de **+12 V** |
+| 17 | Fuente de 12 V, salida **−V** | Línea de **tierra** |
+| 18 | Línea de +12 V | Motor, terminal **+** |
+| 19 | Línea de tierra | Motor, terminal **−** |
+| 20 | Línea de +12 V | Buck, entrada **IN+** |
+| 21 | Línea de tierra | Buck, entrada **IN−** |
+| 22 | Buck, salida **OUT+** *(ajustada a 5,0 V antes de conectar)* | ESP32, pin **`VIN`** / **`5V`** |
+| 23 | Buck, salida **OUT−** | ESP32, pin **`GND`** |
+| 24 | Condensador cerámico 100 nF, una pata | Motor, terminal **+**, soldado en la terminal misma |
+| 25 | Condensador cerámico 100 nF, otra pata | Motor, terminal **−** |
+| 26 | Condensador electrolítico, pata **+** | Línea de +12 V, cerca del buck |
+| 27 | Condensador electrolítico, pata **−** | Línea de tierra |
 
 > Ajustá el buck a 5,0 V con el multímetro **antes** de conectarlo al ESP32. Sale de
 > fábrica en cualquier valor.
@@ -186,17 +202,17 @@ Ver [`esquema.svg`](esquema.svg) para la versión gráfica. En texto:
 
 | # | Desde | Hasta |
 | ---: | :--- | :--- |
-| 24 | U1 pin **`3V3`** | U2 MAX6675 **`VCC`** |
-| 25 | U1 pin **`GND`** | U2 MAX6675 **`GND`** |
-| 26 | U1 pin **`GPIO18`** | U2 MAX6675 **`SCK`** |
-| 27 | U1 pin **`GPIO5`** | U2 MAX6675 **`CS`** |
-| 28 | U1 pin **`GPIO19`** | U2 MAX6675 **`SO`** |
-| 29 | U2 MAX6675 **`T+`** | TC1 conductor **positivo** (ver §4) |
-| 30 | U2 MAX6675 **`T−`** | TC1 conductor **negativo** (ver §4) |
-| 31 | U1 pin **`GPIO23`** | **SSR1 terminal 3 `(+)`** |
-| 32 | U1 pin **`GND`** | **SSR1 terminal 4 `(−)`** |
-| 33 | R3 (10 kΩ), una pata | Sobre el pin `GPIO23`, lo más cerca posible del ESP32 |
-| 34 | R3, otra pata | `GND` del ESP32 |
+| 28 | ESP32, pin **`3V3`** | MAX6675, **`VCC`** |
+| 29 | ESP32, pin **`GND`** | MAX6675, **`GND`** |
+| 30 | ESP32, pin **`GPIO18`** | MAX6675, **`SCK`** |
+| 31 | ESP32, pin **`GPIO5`** | MAX6675, **`CS`** |
+| 32 | ESP32, pin **`GPIO19`** | MAX6675, **`SO`** |
+| 33 | MAX6675, **`T+`** | Termopar, conductor **positivo** (ver §4) |
+| 34 | MAX6675, **`T−`** | Termopar, conductor **negativo** (ver §4) |
+| 35 | ESP32, pin **`GPIO23`** | **Relé de estado sólido, terminal 3 `(+)`** |
+| 36 | ESP32, pin **`GND`** | **Relé de estado sólido, terminal 4 `(−)`** |
+| 37 | Resistencia de 10 kΩ, una pata | Sobre el pin `GPIO23`, lo más cerca posible del ESP32 |
+| 38 | Resistencia de 10 kΩ, otra pata | `GND` del ESP32 |
 
 **El `VCC` del MAX6675 va a `3V3`, nunca a `5V`.** Su pin `SO` saca lógica al nivel de
 su alimentación y el GPIO19 del ESP32 no tolera 5 V.
@@ -227,7 +243,7 @@ la lectura baja en vez de subir, está invertida.**
    el cableado de señal. Rutas distintas, no el mismo mazo.
 3. **El termopar, trenzado y lejos del AC.** Si tiene que cruzar un cable de red, que lo
    haga a 90°, nunca en paralelo. Son microvoltios: el ruido de conmutación se le mete.
-4. **Pasta térmica entre SSR y disipador**, y 2–5 mm de aire entre el disipador y
+4. **Pasta térmica entre el relé y el disipador**, y 2–5 mm de aire entre el disipador y
    cualquier plástico.
 5. **El PETG/PLA no toca el cilindro.** Solo para la base externa de la electrónica.
 6. **Descarga de tracción** en el cable de red: prensaestopas o nudo, para que un tirón
@@ -239,18 +255,18 @@ la lectura baja en vez de subir, está invertida.**
 
 Con la clavija **fuera** de la pared, multímetro en continuidad:
 
-| # | Qué medir | Resultado esperado |
-| ---: | :--- | :--- |
-| V1 | L contra N, interruptor **abierto** | Sin continuidad |
-| V2 | L contra N, interruptor **cerrado** | Solo el consumo de PS1 (alto o abierto, el SSR está en reposo) |
-| V3 | Entre N2 y N3, puenteando el SSR | Debe dar el `R_paralelo` que calculaste |
-| V4 | Cualquier terminal AC contra el chasis | **Sin continuidad.** Si hay, parás |
-| V5 | PE de la clavija contra el chasis | Continuidad franca, < 1 Ω |
-| V6 | `GND` del ESP32 contra el chasis | **Sin continuidad** — confirma que TC1 es de junta aislada |
-| V7 | `GPIO23` contra `GND`, ESP32 sin alimentar | ≈ 10 kΩ — confirma el pulldown R3 |
-| V8 | Salida del buck PS2, alimentado solo desde PS1 | 5,0 V ± 0,1 V, sin el ESP32 conectado |
+| Qué medir | Resultado esperado |
+| :--- | :--- |
+| Fase contra neutro, interruptor **abierto** | Sin continuidad |
+| Fase contra neutro, interruptor **cerrado** | Solo el consumo de la fuente de 12 V (valor alto o abierto: el relé está en reposo) |
+| Entre la clema de resistencias y la clema de neutro, puenteando el relé | El valor del paralelo que calculaste |
+| Cualquier terminal AC contra el chasis | **Sin continuidad.** Si hay, parás |
+| Tierra de la clavija contra el chasis | Continuidad franca, < 1 Ω |
+| `GND` del ESP32 contra el chasis | **Sin continuidad** — confirma que el termopar es de junta aislada |
+| `GPIO23` contra `GND`, ESP32 sin alimentar | ≈ 10 kΩ — confirma la resistencia de pulldown |
+| Salida del buck, alimentado solo desde la fuente de 12 V | 5,0 V ± 0,1 V, sin el ESP32 conectado |
 
-Recién con V1 a V8 en verde pasás a la Etapa 4 de la
+Recién con las ocho en verde pasás a la Etapa 4 de la
 [guía de armado](guia-de-armado.md).
 
 ---
@@ -270,8 +286,8 @@ A un motor de escobillas eso no le importa. Su inductancia y su inercia mecánic
 de filtro: la corriente no alcanza a caer a cero entre pulsos y el rotor ni se entera.
 Por eso el fabricante se ahorró el condensador — no le hacía falta.
 
-A un microcontrolador sí le importaría. El ESP32 necesita un riel estable; alimentado
-con eso se reiniciaría 120 veces por segundo. Para usarlo habría que agregar
+A un microcontrolador sí le importaría. El ESP32 necesita una alimentación estable;
+alimentado con eso se reiniciaría 120 veces por segundo. Para usarlo habría que agregar
 condensador de filtro y regulador.
 
 ### 7.2 No está aislado de la red — y esta es la razón de fondo
@@ -287,15 +303,15 @@ red. Con dos consecuencias:
   GND del MAX6675) quedarían todos a potencial de red.
 - Tocar cualquier pin del ESP32 sería tocar los 120 V.
 
-Ningún condensador arregla eso. Por eso el proyecto usa **PS1**, una fuente conmutada
-**aislada**: tiene un transformador adentro que separa galvánicamente el lado de red del
-lado de 12 V. Esa barrera, sumada al optoacoplador interno del SSR, es lo que mantiene
-toda la electrónica de control fuera del alcance de la red.
+Ningún condensador arregla eso. Por eso el proyecto usa una **fuente conmutada aislada**:
+tiene un transformador adentro que separa galvánicamente el lado de red del lado de 12 V.
+Esa barrera, sumada al optoacoplador interno del relé de estado sólido, es lo que
+mantiene toda la electrónica de control fuera del alcance de la red.
 
 ### 7.3 Lo que sí hace falta comprar por el motor
 
-Nada relacionado con el puente, pero sí **C1 y C2** (§1.3). El motor de escobillas es una
-fuente de ruido eléctrico a centímetros de un amplificador que mide **41 µV por grado**.
-Sin C1 en las terminales del motor, es probable que veas saltos erráticos en la lectura
-de temperatura. Con el diseño original ese ruido no molestaba a nadie porque no había
-nada midiendo microvoltios cerca.
+Nada relacionado con el puente, pero sí los **dos condensadores** de §1.3. El motor de
+escobillas es una fuente de ruido eléctrico a centímetros de un amplificador que mide
+**41 µV por grado**. Sin el cerámico en las terminales del motor, es probable que veas
+saltos erráticos en la lectura de temperatura. Con el diseño original ese ruido no
+molestaba a nadie porque no había nada midiendo microvoltios cerca.
