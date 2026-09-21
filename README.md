@@ -18,7 +18,8 @@ Proyecto académico de la materia de Circuitos.
 | Revisión técnica del diseño | Hecho — ver [revisión](docs/revision-tecnica.md) |
 | Topología definida (motor con DC propia) | Hecho — ver [guía de armado](docs/guia-de-armado.md) |
 | Firmware de control | Primera versión, sin probar en hardware |
-| Prueba de banco del relé | Sketch listo — ver [`prueba_ssr`](firmware/prueba_ssr/prueba_ssr.ino) |
+| Prueba 1 — relé solo | **Funciona.** El relé dispara a 3,3 V |
+| Prueba 2 — termopar + potencia manual | Sketch listo — ver [`prueba_termopar`](firmware/prueba_termopar/prueba_termopar.ino) |
 | Medición de resistencias | Pendiente — bloquea el cableado AC |
 | Armado | Pendiente |
 | Sintonización PID | Pendiente |
@@ -40,8 +41,10 @@ docs/
                                           propia), cálculos y orden de armado.
 firmware/
   popcorn_oven/popcorn_oven.ino           Firmware de control (Arduino IDE).
-  prueba_ssr/prueba_ssr.ino               Prueba de banco del relé, sin termopar
+  prueba_ssr/prueba_ssr.ino               Prueba 1: relé solo, sin termopar
                                           ni conexión a la red.
+  prueba_termopar/prueba_termopar.ino     Prueba 2: lectura del termopar más
+                                          control manual de la potencia.
 ```
 
 El esquema de cableado vigente es el de [`esquema-de-conexiones.md`](docs/esquema-de-conexiones.md).
