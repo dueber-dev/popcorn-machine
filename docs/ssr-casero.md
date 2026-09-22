@@ -98,6 +98,28 @@ nada**. La ventana de 2 segundos funciona idéntico.
 Alternativas al BTA41 si no lo conseguís: **BTA24-600B** (25 A) o **BTA16-600B** (16 A).
 Los tres aguantan 10 A; el más grande simplemente corre más frío.
 
+### 3.1.1 Pinout del MOC3063
+
+Según el datasheet de Fairchild (MOC306XM):
+
+| Pin | Nombre | Se conecta a |
+| ---: | :--- | :--- |
+| 1 | `ANODE` | Resistencia de 330 Ω desde `GPIO23` |
+| 2 | `CATHODE` | `GND` del ESP32 |
+| 3 | `N/C` | Nada |
+| 4 | `MAIN TERM.` | Puerta del triac |
+| 5 | `NC*` — **sustrato del triac** | **Nada, nunca** |
+| 6 | `MAIN TERM.` | Resistencia de 220 Ω hacia MT2 |
+
+El pin 1 se identifica por la muesca del encapsulado.
+
+> **El pin 5 no es un pin libre.** El datasheet lo marca *"DO NOT CONNECT (TRIAC
+> SUBSTRATE)"*. Usarlo de puente en la protoboard daña el dispositivo. Al aire, igual
+> que el 3.
+
+Los pines 4 y 6 son los dos terminales del fototriac, que es bidireccional. La
+orientación indicada es la de los circuitos de aplicación del datasheet.
+
 ### 3.2 Componentes pasivos
 
 | Componente | Valor | Función |
@@ -294,6 +316,10 @@ triac disipa medio vatio.
 > más gruesas que un TO-220. Forzarlas abre los contactos de forma permanente y después
 > esa fila ya no hace contacto con nada. Soldale a cada pata un tramo de alambre rígido
 > AWG 22, o usá caimanes. El MOC3063 en DIP-6 sí entra bien, a caballo del canal central.
+
+**No se une ningún GND entre los dos lados.** Ni referencia, ni masa común. Lo único que
+vincula el lado del ESP32 con el del transformador es la luz dentro del optoacoplador.
+Cerrar ese circuito con un cable anula la razón de ser del diseño.
 
 **Identificación de patas antes de conectar.** El orden de pines del triac cambia entre
 TO-220 y TOP-3, así que no lo asumas: con el multímetro en modo diodo, entre **puerta y
