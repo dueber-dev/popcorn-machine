@@ -275,6 +275,21 @@ ronda los 20 V.
 
 Es la forma de descubrir un cableado invertido con 24 V en lugar de con 120.
 
+Para esta prueba se usan **solo cuatro componentes**: el optoacoplador, el triac, la
+resistencia de 330 Ω y la de 180 Ω. El snubber, el varistor y el disipador **no van
+todavía** — el snubber y el varistor protegen de la red, que acá no existe, y a 0,42 A el
+triac disipa medio vatio.
+
+> **El BTA41 no entra en la protoboard.** Viene en encapsulado TOP-3, con patas bastante
+> más gruesas que un TO-220. Forzarlas abre los contactos de forma permanente y después
+> esa fila ya no hace contacto con nada. Soldale a cada pata un tramo de alambre rígido
+> AWG 22, o usá caimanes. El MOC3063 en DIP-6 sí entra bien, a caballo del canal central.
+
+**Identificación de patas antes de conectar.** El orden de pines del triac cambia entre
+TO-220 y TOP-3, así que no lo asumas: con el multímetro en modo diodo, entre **puerta y
+MT1** se leen unas decenas de ohmios en ambos sentidos, y entre **MT1 y MT2**, abierto.
+El pin 1 del MOC3063 se identifica por la muesca del encapsulado.
+
 #### Después, a 120 V
 
 Usá una **bombilla incandescente de 40 o 60 W** como carga en lugar de las resistencias
