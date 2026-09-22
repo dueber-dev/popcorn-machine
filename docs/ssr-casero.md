@@ -109,7 +109,7 @@ Según el datasheet de Fairchild (MOC306XM):
 | 3 | `N/C` | Nada |
 | 4 | `MAIN TERM.` | Puerta del triac |
 | 5 | `NC*` — **sustrato del triac** | **Nada, nunca** |
-| 6 | `MAIN TERM.` | Resistencia de 220 Ω hacia MT2 |
+| 6 | `MAIN TERM.` | Resistencia de 220 Ω hacia A2 del triac |
 
 El pin 1 se identifica por la muesca del encapsulado.
 
@@ -125,8 +125,8 @@ orientación indicada es la de los circuitos de aplicación del datasheet.
 | Componente | Valor | Función |
 | :--- | :--- | :--- |
 | Resistencia de entrada | **330 Ω**, 1/4 W | Limita la corriente del LED del optoacoplador a ~6 mA. Una de 220 Ω también sirve: da 9 mA |
-| Resistencia de puerta | **220 Ω**, 1 W | Limita la corriente pico del fototriac. **Nunca por debajo de 180 Ω** |
-| Resistencia de puerta a MT1 *(opcional)* | 1 kΩ, 1/4 W | Mejora la inmunidad al ruido, evita disparos falsos |
+| Resistencia de puerta | **220 Ω**, 1 W | Va entre el pin 6 del optoacoplador y A2. **Nunca por debajo de 180 Ω** |
+| Resistencia de puerta a A1 *(opcional)* | 1 kΩ, 1/4 W | Mejora la inmunidad al ruido, evita disparos falsos |
 | Resistencia del snubber | **100 Ω**, 2 W | Amortigua el dV/dt |
 | Condensador del snubber | **100 nF, clase X2, 275 VAC** | Va conectado a la red: **tiene que ser X2**. Un cerámico común no sirve |
 | Varistor (MOV) | 14 mm, 130–150 VAC de operación (S14K130 o 14D201K) | Absorbe picos de la red |
@@ -321,9 +321,39 @@ triac disipa medio vatio.
 vincula el lado del ESP32 con el del transformador es la luz dentro del optoacoplador.
 Cerrar ese circuito con un cable anula la razón de ser del diseño.
 
-**Identificación de patas antes de conectar.** El orden de pines del triac cambia entre
-TO-220 y TOP-3, así que no lo asumas: con el multímetro en modo diodo, entre **puerta y
-MT1** se leen unas decenas de ohmios en ambos sentidos, y entre **MT1 y MT2**, abierto.
+#### Identificación de las patas del triac
+
+ST nombra las patas del BTA41 como **A1, A2 y G**. Es la misma cosa que MT1, MT2 y
+puerta; solo cambia la nomenclatura.
+
+El orden de pines cambia entre encapsulados, así que no se asume: se mide. Multímetro en
+ohmios, escala 200 Ω, con el triac desconectado de todo.
+
+| Par | Lectura esperada |
+| :--- | :--- |
+| **G – A1** | **Baja**: decenas de ohmios, típico 10–100 Ω |
+| G – A2 | Abierto |
+| A1 – A2 | Abierto |
+
+Solo un par da lectura baja: ese par son **la puerta y A1**, y **la pata que sobra es
+A2**. Esa es la certeza que hace falta, porque A2 es donde llegan el transformador y la
+resistencia de 220 Ω.
+
+Para separar G de A1 entre las dos restantes, se prueba una y si la lámpara no enciende
+se invierten. A 24 V no se daña nada: la resistencia de 220 Ω limita la corriente por el
+optoacoplador a 134 mA, muy por debajo del 1 A que aguanta. Es otra razón para hacer esta
+prueba a 24 V y no a 120.
+
+Como contraste, en el BTA41 en TOP-3 lo habitual es **A1, A2, G** de izquierda a derecha,
+con la cara marcada hacia el observador y las patas hacia abajo. La medición manda sobre
+eso.
+
+#### Verificar que el triac es realmente un BTA
+
+Medir continuidad entre el **tab metálico y cada una de las tres patas**: las tres deben
+dar **abierto**. Si el tab tiene continuidad con alguna pata, es un **BTB**, no un BTA, y
+en el montaje final el disipador quedaría a potencial de red.
+
 El pin 1 del MOC3063 se identifica por la muesca del encapsulado.
 
 #### Después, a 120 V

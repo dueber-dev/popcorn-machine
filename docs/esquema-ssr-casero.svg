@@ -95,8 +95,8 @@
   <circle class="node" cx="932" cy="140" r="5"/>
   <path class="wAC" d="M932 406 V580"/>
   <circle class="node" cx="932" cy="580" r="5"/>
-  <text class="pinR" x="944" y="296">MT2</text>
-  <text class="pinR" x="944" y="424">MT1</text>
+  <text class="pinR" x="944" y="296">A2</text>
+  <text class="pinR" x="944" y="424">A1</text>
 
   <!-- snubber -->
   <path class="wAC" d="M1072 140 V246"/>
