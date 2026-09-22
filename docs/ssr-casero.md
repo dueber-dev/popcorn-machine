@@ -326,8 +326,30 @@ Cerrar ese circuito con un cable anula la razón de ser del diseño.
 ST nombra las patas del BTA41 como **A1, A2 y G**. Es la misma cosa que MT1, MT2 y
 puerta; solo cambia la nomenclatura.
 
-El orden de pines cambia entre encapsulados, así que no se asume: se mide. Multímetro en
-ohmios, escala 200 Ω, con el triac desconectado de todo.
+**Para el BTA41-600B en TOP-3**, sosteniéndolo con la cara marcada hacia el observador,
+el tab metálico arriba y las patas hacia abajo:
+
+| Pata | Nombre |
+| :--- | :--- |
+| **Izquierda** | **A1** |
+| **Del medio** | **A2** |
+| **Derecha** | **G** (puerta) |
+| Tab metálico | Aislado, no es una conexión |
+
+Los códigos impresos en el plástico (`PHL`, la fecha de lote) son del fabricante: **no
+identifican las patas**. Ningún triac las rotula; la identificación es por posición.
+
+**Confirmación en 30 segundos.** El orden cambia entre encapsulados, así que conviene
+verificarlo. Multímetro en ohmios, escala 200 Ω, triac desconectado de todo:
+
+| Par | Lectura esperada |
+| :--- | :--- |
+| Izquierda – derecha | **Decenas de ohmios** (es el par G–A1) |
+| Izquierda – medio | Abierto |
+| Medio – derecha | Abierto |
+
+Si da eso, la tabla de arriba es correcta. Si el par de lectura baja resulta ser otro, el
+criterio general es el siguiente.
 
 | Par | Lectura esperada |
 | :--- | :--- |
