@@ -77,7 +77,7 @@
   <!-- rama del pin 6: resistencia de puerta a la fase -->
   <path class="wAC" d="M650 239 H676"/>
   <rect class="box" x="676" y="227" width="64" height="24" rx="3"/>
-  <text class="sml" x="708" y="220" text-anchor="middle">180 Ω · 1 W</text>
+  <text class="sml" x="708" y="220" text-anchor="middle">220 Ω · 1 W</text>
   <path class="wAC" d="M740 239 H792 V140"/>
   <circle class="node" cx="792" cy="140" r="5"/>
 

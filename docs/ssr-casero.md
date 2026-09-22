@@ -102,16 +102,26 @@ Los tres aguantan 10 A; el más grande simplemente corre más frío.
 
 | Componente | Valor | Función |
 | :--- | :--- | :--- |
-| Resistencia de entrada | **330 Ω**, 1/4 W | Limita la corriente del LED del optoacoplador a ~6 mA |
-| Resistencia de puerta | **180 Ω**, 1 W | Limita la corriente pico del fototriac. **No bajar de 180 Ω** |
+| Resistencia de entrada | **330 Ω**, 1/4 W | Limita la corriente del LED del optoacoplador a ~6 mA. Una de 220 Ω también sirve: da 9 mA |
+| Resistencia de puerta | **220 Ω**, 1 W | Limita la corriente pico del fototriac. **Nunca por debajo de 180 Ω** |
 | Resistencia de puerta a MT1 *(opcional)* | 1 kΩ, 1/4 W | Mejora la inmunidad al ruido, evita disparos falsos |
 | Resistencia del snubber | **100 Ω**, 2 W | Amortigua el dV/dt |
 | Condensador del snubber | **100 nF, clase X2, 275 VAC** | Va conectado a la red: **tiene que ser X2**. Un cerámico común no sirve |
 | Varistor (MOV) | 14 mm, 130–150 VAC de operación (S14K130 o 14D201K) | Absorbe picos de la red |
 
-**El 180 Ω no es un valor arbitrario.** El pico de la senoidal son 170 V, y el MOC3063
-aguanta 1 A de pico: 170 / 180 = 0,94 A, justo por debajo del límite. Si ponés 100 Ω lo
-destruís.
+**La resistencia de puerta no es un valor arbitrario.** Es lo único que limita la
+corriente del fototriac del MOC3063, que aguanta **1 A de pico**, contra los 170 V de
+pico de la senoidal:
+
+| Resistencia | Corriente pico a 120 V | Veredicto |
+| ---: | ---: | :--- |
+| 100 Ω | 1,70 A | **Destruye el optoacoplador** |
+| 180 Ω | 0,94 A | Justo en el límite |
+| **220 Ω** | **0,77 A** | Buen margen, y es el valor más fácil de conseguir |
+
+Con 220 Ω quedan hasta 750 mA disponibles para la puerta a 120 V, y ~134 mA en la prueba
+a 24 V. El BTA41 necesita 50 mA, así que sobra en los dos casos: el mismo valor sirve
+para la prueba y para el montaje final.
 
 **El condensador X2 tampoco es negociable.** Un capacitor conectado entre línea y neutro
 que falle en cortocircuito provoca un incendio. Los X2 están diseñados para fallar en
@@ -276,7 +286,7 @@ ronda los 20 V.
 Es la forma de descubrir un cableado invertido con 24 V en lugar de con 120.
 
 Para esta prueba se usan **solo cuatro componentes**: el optoacoplador, el triac, la
-resistencia de 330 Ω y la de 180 Ω. El snubber, el varistor y el disipador **no van
+resistencia de 330 Ω y la de 220 Ω. El snubber, el varistor y el disipador **no van
 todavía** — el snubber y el varistor protegen de la red, que acá no existe, y a 0,42 A el
 triac disipa medio vatio.
 
