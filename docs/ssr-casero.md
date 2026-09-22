@@ -40,12 +40,18 @@ llama, y los contactos quedan expuestos al dedo. Son 120 V que pueden matar.
 
 ### 1.3 Qué sí va en protoboard
 
-El **lado de control**: el optoacoplador, su resistencia de entrada y los cables al
-ESP32. Todo eso es de baja tensión y corrientes de miliamperios. Podés prototiparlo ahí
-sin problema.
+El **lado de control**: la resistencia de entrada y los cables al ESP32. Baja tensión y
+miliamperios.
 
-El **lado de potencia** va en PCB, o directamente cableado a los terminales del triac.
-Nunca en protoboard.
+Ojo con una trampa: **el optoacoplador no es "el lado de control"**. Sus pines 4 y 6
+están a potencial de red. Si el circuito está conectado a 120 V, el MOC3063 tampoco puede
+estar en la protoboard.
+
+La excepción es la prueba a 24 V de la Etapa C: ahí **todo** puede ir en protoboard,
+porque no hay red en ninguna parte.
+
+Con 120 V, el lado de potencia va en placa soldada —perforada alcanza para probar— o
+cableado directo a los terminales del triac. Nunca en protoboard.
 
 ---
 
@@ -243,7 +249,35 @@ Soldá todo. Después, con el multímetro en continuidad, verificá:
 
 ### Etapa C — Primera prueba con carga, pero **no** con la resistencia
 
-Usá una **bombilla incandescente de 60 o 100 W** como carga en lugar de las resistencias
+#### La carga mínima no es libre: la fija el triac
+
+Un triac necesita una **corriente de mantenimiento** para quedarse enganchado después de
+que la puerta lo dispara. El BTA41 pide hasta unos **100–120 mA**. Por debajo de eso se
+dispara en cada cruce por cero y se suelta enseguida: parpadeo errático, o nada.
+
+```
+carga mínima a 120 V = 0,12 A × 120 V ≈ 14 W
+```
+
+Con margen: **40 W como mínimo, 60 W cómodo**. Una bombilla de 1 W consume 8 mA y **no
+funciona** — y el síntoma parece una falla del circuito cuando en realidad es la carga.
+
+Y tiene que ser **incandescente**. Las LED y las ahorradoras traen fuente conmutada
+adentro: consumen poco, su entrada es capacitiva y se comportan mal con triacs.
+
+#### Opción segura: probarlo entero a 24 V
+
+Antes de tocar los 120 V, se puede validar el circuito completo con un **transformador de
+24 V AC** (el de timbre de puerta) y una **lámpara de 24 V / 10 W**. Nada supera los 34 V
+de pico, así que esta versión **sí se puede armar en protoboard**, y a 24 V el detector de
+cruce por cero del MOC3063 sigue funcionando de verdad, porque su tensión de inhibición
+ronda los 20 V.
+
+Es la forma de descubrir un cableado invertido con 24 V en lugar de con 120.
+
+#### Después, a 120 V
+
+Usá una **bombilla incandescente de 40 o 60 W** como carga en lugar de las resistencias
 de la palomitera. Razones:
 
 - Consume menos de 1 A, así que un error no funde nada.
