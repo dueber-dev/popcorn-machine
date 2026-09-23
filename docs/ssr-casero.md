@@ -380,6 +380,36 @@ El pin 1 del MOC3063 se identifica por la muesca del encapsulado.
 
 #### Después, a 120 V
 
+Esta versión **no va en protoboard**, y la trampa es que los pines 4 y 6 del MOC3063
+también están a potencial de red: el optoacoplador tampoco puede ir ahí. Todo el circuito
+va soldado en placa perforada; no hace falta la PCB terminada para probar.
+
+| # | Desde | Hasta |
+| ---: | :--- | :--- |
+| 1 | ESP32 `GPIO23` | Resistencia 330 Ω, una pata |
+| 2 | Resistencia 330 Ω, otra pata | MOC3063 **pin 1** (`ANODE`) |
+| 3 | MOC3063 **pin 2** (`CATHODE`) | ESP32 `GND` |
+| 4 | MOC3063 **pin 6** (`MAIN TERM.`) | Resistencia 220 Ω **1 W**, una pata |
+| 5 | Resistencia 220 Ω, otra pata | Triac, **pata del medio (A2)** |
+| 6 | MOC3063 **pin 4** (`MAIN TERM.`) | Triac, **pata derecha (G)** |
+| 7 | Clavija, conductor de **fase** | Triac, **pata del medio (A2)** |
+| 8 | Triac, **pata izquierda (A1)** | Portalámparas, un terminal |
+| 9 | Portalámparas, otro terminal | Clavija, conductor de **neutro** |
+| 10 | Snubber: 100 Ω 2 W en serie con 100 nF X2 | Entre **A2** y **A1** del triac |
+
+Sin conectar: pin 3 y pin 5 del MOC3063, y el tab del triac. Ningún cable une el ESP32
+con el lado de red.
+
+Diferencias respecto a la prueba de 24 V:
+
+| | 24 V | 120 V |
+| :--- | :--- | :--- |
+| Protoboard | Sí, todo | **No**, ni el optoacoplador |
+| Snubber | No hacía falta | **Sí** — ahora hay red |
+| Carga | 5–10 W | **40–60 W incandescente** |
+| Disipador del triac | No | No: a 0,5 A disipa 0,6 W |
+| Resistencia de puerta | 1/4 W bastaba | **1 W** |
+
 Usá una **bombilla incandescente de 40 o 60 W** como carga en lugar de las resistencias
 de la palomitera. Razones:
 
