@@ -1,53 +1,51 @@
 /*
  * ============================================================================
- *  PRUEBA DE BANCO — ESP32 + relé de estado sólido SSR-25 DA
- *  SIN termopar, SIN resistencias, SIN nada conectado a la red.
+ *  PRUEBA DE BANCO — ESP32 + relé de estado sólido (comercial o construido)
+ *  Control MANUAL de la potencia por ancho de pulso. Sin termopar, sin PID.
  * ----------------------------------------------------------------------------
- *  Qué hace:
- *    Reproduce exactamente el mecanismo de control del firmware real —ancho de
- *    pulso sobre una ventana de 2 segundos— pero con la potencia puesta a mano
- *    en vez de calculada por el PID. Sirve para verificar tres cosas:
+ *  Sirve para dos cosas:
+ *    1. Verificar el relé en seco o con una lámpara de prueba.
+ *    2. Primeros disparos con la resistencia real, a baja potencia.
  *
- *      1. Que el cableado GPIO23 / GND al relé está bien.
- *      2. Que tu ejemplar de SSR-25 DA dispara con los 3,3 V del ESP32.
- *         (Su entrada está especificada 3-32 VDC; 3,3 V es el borde inferior,
- *         y hay ejemplares que piden 4 V. Esta prueba te lo dice.)
- *      3. Que la lógica de la ventana de tiempo hace lo que debe.
- *
- *  CONEXIONES (solo tres cables):
- *    ESP32 GPIO23  →  relé, terminal 3 (+)
- *    ESP32 GND     →  relé, terminal 4 (−)
+ *  CONEXIONES (solo tres cables del lado de control):
+ *    ESP32 GPIO23  →  entrada (+) del relé   [MOC3063 pin 1 vía 330 Ω]
+ *    ESP32 GND     →  entrada (−) del relé   [MOC3063 pin 2]
  *    ESP32 USB     →  computadora
  *
- *    Terminales 1 y 2 del relé: VACÍOS. Nada de red. Nada de resistencias.
- *
- *  CÓMO VERIFICAR:
- *    a) El LED indicador del relé sigue el ciclo (si tu ejemplar trae LED).
- *    b) El LED de la placa ESP32 (GPIO2) hace lo mismo, en espejo.
- *    c) Multímetro en VOLTIOS DC entre GPIO23 y GND: como el multímetro
- *       promedia, deberías leer aproximadamente potencia% × 3,3 V.
- *         100 %  →  ~3,3 V       50 %  →  ~1,65 V
- *          75 %  →  ~2,5 V       25 %  →  ~0,83 V
- *           0 %  →  ~0 V
- *       Esta es la verificación más sólida: mide el ciclo de trabajo real.
- *
  *  COMANDOS (monitor serie a 115200 baudios):
- *    P50    fija la potencia en 50 %   (P0 a P100)
+ *    P50    fija la potencia en 50 %   (P0 a P100, limitado por POTENCIA_MAX)
  *    AUTO   barrido automático: 0, 25, 50, 75, 100 %, 8 s cada escalón
- *    ON     100 %
+ *    ON     potencia al máximo permitido
  *    OFF    0 %
+ *
+ *  CÓMO VERIFICAR SIN CARGA
+ *    Multímetro en VOLTIOS DC entre GPIO23 y GND: como el multímetro promedia,
+ *    deberías leer aproximadamente potencia% × 3,3 V.
+ *      100 % → ~3,3 V    50 % → ~1,65 V    25 % → ~0,83 V    0 % → ~0 V
  * ============================================================================
  */
 
-const int PIN_SSR = 23;   // al terminal 3 (+) del relé
+const int PIN_SSR = 23;   // entrada (+) del relé
 const int PIN_LED = 2;    // LED de la placa ESP32 DevKit v1
 
 const unsigned long VENTANA_MS   = 2000;  // misma ventana que el firmware real
 const unsigned long PASO_AUTO_MS = 8000;  // duración de cada escalón en AUTO
 const unsigned long PERIODO_LOG  = 500;
 
+// ------------------------------------------------------- CONFIGURACIÓN ----
+// Techo de potencia. Con la resistencia real, empezá en 25 y subilo recién
+// cuando sepas cómo responde. Con este tope, un P100 mal tecleado no puede
+// mandar la resistencia a plena potencia.
+const int POTENCIA_MAX = 25;
+
+// Con carga real conviene arrancar quieto: en manual y en 0 %.
+// Para la prueba con lámpara podés poner ambos en true.
+const bool ARRANCAR_EN_AUTO   = false;  // true = barrido automático al bootear
+const bool PULSOS_DE_ARRANQUE = false;  // true = 3 pulsos de 1 s A PLENA POTENCIA
+
+// -------------------------------------------------------------- ESTADO ----
 int  potencia    = 0;       // 0-100 %
-bool modoAuto    = true;
+bool modoAuto    = false;
 int  pasoAuto    = 0;
 const int ESCALONES[] = {0, 25, 50, 75, 100};
 const int N_ESCALONES = 5;
@@ -56,6 +54,12 @@ unsigned long inicioVentana = 0;
 unsigned long ultimoPaso    = 0;
 unsigned long ultimoLog     = 0;
 bool estadoSSR = false;
+
+int limitar(int v) {
+  if (v < 0) return 0;
+  if (v > POTENCIA_MAX) return POTENCIA_MAX;
+  return v;
+}
 
 void aplicar(bool encendido) {
   estadoSSR = encendido;
@@ -72,19 +76,25 @@ void setup() {
   delay(400);
 
   Serial.println();
-  Serial.println("=== PRUEBA DE BANCO :: ESP32 + SSR-25 DA ===");
-  Serial.println("Terminales 1 y 2 del rele deben estar VACIOS.");
+  Serial.println("=== PRUEBA DE BANCO :: ESP32 + rele de estado solido ===");
+  Serial.print  ("Techo de potencia: "); Serial.print(POTENCIA_MAX); Serial.println(" %");
   Serial.println();
 
-  // Tres pulsos lentos de un segundo: confirmacion visual de cableado.
-  Serial.println("Autoprueba: 3 pulsos de 1 s...");
-  for (int i = 0; i < 3; i++) {
-    aplicar(true);  delay(1000);
-    aplicar(false); delay(1000);
+  if (PULSOS_DE_ARRANQUE) {
+    Serial.println("Autoprueba: 3 pulsos de 1 s a plena potencia...");
+    for (int i = 0; i < 3; i++) {
+      aplicar(true);  delay(1000);
+      aplicar(false); delay(1000);
+    }
+    Serial.println("Si viste parpadear el rele, el cableado esta bien.");
+    Serial.println();
   }
-  Serial.println("Si viste parpadear el LED del rele, el cableado esta bien.");
-  Serial.println("Si no parpadeo, ver la nota sobre los 3,3 V al final.");
-  Serial.println();
+
+  modoAuto = ARRANCAR_EN_AUTO;
+  potencia = 0;
+
+  Serial.print("Arranque en "); Serial.print(modoAuto ? "AUTO" : "MANUAL");
+  Serial.println(" y 0 %. No calienta hasta que lo pidas.");
   Serial.println("Comandos: P<0-100> | AUTO | ON | OFF");
   Serial.println("-------------------------------------------");
 
@@ -101,7 +111,7 @@ void loop() {
   if (modoAuto && ahora - ultimoPaso >= PASO_AUTO_MS) {
     ultimoPaso = ahora;
     pasoAuto   = (pasoAuto + 1) % N_ESCALONES;
-    potencia   = ESCALONES[pasoAuto];
+    potencia   = limitar(ESCALONES[pasoAuto]);
     Serial.print(">> AUTO: escalon a ");
     Serial.print(potencia);
     Serial.println(" %");
@@ -151,20 +161,24 @@ void atenderSerial() {
   if (cmd == "AUTO") {
     modoAuto = true;
     ultimoPaso = millis();
-    Serial.println(">> Modo AUTO: barrido 0-25-50-75-100 %");
+    Serial.print(">> Modo AUTO, con techo de "); Serial.print(POTENCIA_MAX); Serial.println(" %");
   } else if (cmd == "ON") {
-    modoAuto = false; potencia = 100;
-    Serial.println(">> 100 % — el rele deberia quedar fijo encendido");
+    modoAuto = false; potencia = POTENCIA_MAX;
+    Serial.print(">> Potencia al maximo permitido: "); Serial.print(potencia); Serial.println(" %");
   } else if (cmd == "OFF") {
     modoAuto = false; potencia = 0;
-    Serial.println(">> 0 % — el rele deberia quedar fijo apagado");
+    Serial.println(">> 0 % — el rele queda fijo apagado");
   } else if (cmd.charAt(0) == 'P') {
     int v = cmd.substring(1).toInt();
     if (v < 0 || v > 100) {
       Serial.println(">> Fuera de rango. Usa P0 a P100.");
     } else {
-      modoAuto = false; potencia = v;
+      modoAuto = false;
+      potencia = limitar(v);
       Serial.print(">> Potencia manual: "); Serial.print(potencia); Serial.println(" %");
+      if (potencia < v) {
+        Serial.print("   (recortado por POTENCIA_MAX = "); Serial.print(POTENCIA_MAX); Serial.println(" %)");
+      }
     }
   } else {
     Serial.println(">> Comando no reconocido. Usa P<0-100>, AUTO, ON u OFF.");
@@ -175,26 +189,15 @@ void atenderSerial() {
  * ----------------------------------------------------------------------------
  *  SI EL RELE NO ENCIENDE NUNCA
  *
- *  Antes de sospechar del codigo, descartá lo facil:
- *
  *  1. Medí con el multimetro en VDC entre GPIO23 y GND con el comando ON.
- *     - Si lee ~3,3 V, el ESP32 esta haciendo su trabajo y el problema es el
- *       margen de disparo del rele.
+ *     - Si lee ~3,3 V, el ESP32 hace su trabajo y el problema esta del otro lado.
  *     - Si lee ~0 V, revisá que cargaste este sketch y que el pin es el 23.
  *
- *  2. Polaridad: el terminal 3 es (+) y el 4 es (−). Invertidos no enciende.
+ *  2. Polaridad: en el rele comercial, terminal 3 es (+) y 4 es (−). En el
+ *     construido, el pin 1 del MOC3063 es el anodo y el 2 el catodo.
  *
- *  3. Margen de 3,3 V. Mirá la etiqueta del rele. Si dice "4-32 VDC" en vez de
- *     "3-32 VDC", tu ejemplar no dispara con el ESP32 directo. Solucion:
- *     un MOSFET 2N7000 como intermediario, con la entrada del rele a 5 V.
- *
- *       GPIO23 ──[1 kΩ]── gate del 2N7000
- *       source del 2N7000 ── GND
- *       drain  del 2N7000 ── terminal 4 (−) del rele
- *       terminal 3 (+) del rele ── 5 V del ESP32
- *       (y dejá la resistencia de 10 kΩ entre gate y GND)
- *
- *     Es mejor descubrir esto ahora, en el banco, que con la resistencia de
- *     1000 W ya cableada.
+ *  3. Con el rele construido: si el triac no engancha, revisá que la carga
+ *     tenga corriente suficiente. El BTA41 pide hasta 120 mA de mantenimiento,
+ *     o sea unos 14 W minimo a 120 V.
  * ----------------------------------------------------------------------------
  */
