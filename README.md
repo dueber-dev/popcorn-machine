@@ -19,8 +19,10 @@ Proyecto académico de la materia de Circuitos.
 | Topología definida (motor con DC propia) | Hecho — ver [guía de armado](docs/guia-de-armado.md) |
 | Firmware de control | Primera versión, sin probar en hardware |
 | Prueba 1 — relé solo | **Funciona.** El relé dispara a 3,3 V |
-| Prueba 2 — termopar + potencia manual | Sketch listo — ver [`prueba_termopar`](firmware/prueba_termopar/prueba_termopar.ino) |
+| Prueba 1b — relé casero con la resistencia | **Funciona** a potencia baja |
+| Prueba 2 — termopar + techo de temperatura | Sketch listo — ver [`prueba_termopar`](firmware/prueba_termopar/prueba_termopar.ino) |
 | Relé construido en PCB | Diseño listo — ver [`ssr-casero.md`](docs/ssr-casero.md) |
+| Techo de temperatura de trabajo | Pendiente — se define tanteando |
 | Medición de resistencias | Pendiente — bloquea el cableado AC |
 | Armado | Pendiente |
 | Sintonización PID | Pendiente |
@@ -47,8 +49,8 @@ firmware/
   popcorn_oven/popcorn_oven.ino           Firmware de control (Arduino IDE).
   prueba_ssr/prueba_ssr.ino               Prueba 1: relé solo, sin termopar
                                           ni conexión a la red.
-  prueba_termopar/prueba_termopar.ino     Prueba 2: lectura del termopar más
-                                          control manual de la potencia.
+  prueba_termopar/prueba_termopar.ino     Prueba 2: termopar más potencia manual
+                                          con techo de temperatura configurable.
 ```
 
 El esquema de cableado vigente es el de [`esquema-de-conexiones.md`](docs/esquema-de-conexiones.md).
