@@ -22,6 +22,7 @@ Proyecto académico de la materia de Circuitos.
 | Prueba 1b — relé casero con la resistencia | **Funciona** a potencia baja |
 | Prueba 2 — termopar + techo de temperatura | Sketch listo — ver [`prueba_termopar`](firmware/prueba_termopar/prueba_termopar.ino) |
 | Relé construido en PCB | Diseño listo — ver [`ssr-casero.md`](docs/ssr-casero.md) |
+| Memoria de cálculo | Hecha — ver [`memoria-de-calculo.md`](docs/memoria-de-calculo.md) |
 | Techo de temperatura de trabajo | Pendiente — se define tanteando |
 | Medición de resistencias | Pendiente — bloquea el cableado AC |
 | Armado | Pendiente |
@@ -45,6 +46,8 @@ docs/
   esquema-ssr-casero.svg                  Esquemático de ese relé.
   guia-de-armado.md                       Topología vigente (motor con fuente DC
                                           propia), cálculos y orden de armado.
+  memoria-de-calculo.md                   Justificación numérica de cada valor
+                                          del proyecto, para defenderlo.
 firmware/
   popcorn_oven/popcorn_oven.ino           Firmware de control (Arduino IDE).
   prueba_ssr/prueba_ssr.ino               Prueba 1: relé solo, sin termopar
